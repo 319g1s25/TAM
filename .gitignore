@@ -1,0 +1,23 @@
+# Ignore Node.js dependencies
+node_modules/
+npm-debug.log
+
+# Ignore environment files
+.env
+
+# Ignore logs
+logs/
+*.log
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore Docker-related files
+docker-compose.override.yml
+.dockerignore
+
+# Ignore Angular build files
+frontend/dist/
+frontend/.angular/
+
+# Ignore MySQL data (if using Docker volumes)
+mysql-data/
