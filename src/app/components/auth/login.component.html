@@ -1,0 +1,82 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>TAM</h1>
+      <h2>Teaching Assistant Management</h2>
+    </div>
+
+    <div class="login-form">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email" 
+            placeholder="Enter your email"
+            [ngClass]="{'invalid': loginForm.get('email')?.invalid && loginForm.get('email')?.touched}"
+          >
+          <div class="error-message" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+            <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</span>
+            <span *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            formControlName="password"
+            placeholder="Enter your password"
+            [ngClass]="{'invalid': loginForm.get('password')?.invalid && loginForm.get('password')?.touched}"
+          >
+          <div class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</span>
+            <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</span>
+          </div>
+        </div>
+        
+        <div class="error-alert" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+        
+        <button 
+          type="submit" 
+          class="login-button" 
+          [disabled]="loginForm.invalid || isLoading"
+        >
+          <span *ngIf="!isLoading">Login</span>
+          <span *ngIf="isLoading" class="loading-spinner"></span>
+        </button>
+      </form>
+    </div>
+    
+    <div class="demo-section">
+      <h3>Demo Login Options</h3>
+      <div class="demo-buttons">
+        <button 
+          class="demo-button admin" 
+          (click)="loginAsDemo('admin')" 
+          [disabled]="isLoading"
+        >
+          Login as Admin
+        </button>
+        <button 
+          class="demo-button coordinator" 
+          (click)="loginAsDemo('coordinator')" 
+          [disabled]="isLoading"
+        >
+          Login as Coordinator
+        </button>
+        <button 
+          class="demo-button ta" 
+          (click)="loginAsDemo('ta')" 
+          [disabled]="isLoading"
+        >
+          Login as TA
+        </button>
+      </div>
+    </div>
+  </div>
+</div> 

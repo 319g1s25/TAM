@@ -1,0 +1,103 @@
+<div class="assignments-container">
+  <div class="header-section">
+    <h1 class="page-title">TA Assignments</h1>
+    <p class="subtitle">Manage and track assignments for teaching assistants</p>
+    <div class="action-buttons">
+      <a routerLink="/assignments/add" class="add-assignment-btn">
+        <svg class="icon-plus" viewBox="0 0 24 24" width="16" height="16">
+          <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+        </svg>
+        New Assignment
+      </a>
+    </div>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-group">
+      <h2 class="section-title">Filter Assignments</h2>
+      <div class="filters">
+        <div class="filter-pills">
+          <span class="filter-label">Status:</span>
+          <button 
+            (click)="setStatusFilter('all')" 
+            class="filter-pill" 
+            [class.active]="statusFilter === 'all'">
+            All
+          </button>
+          <button 
+            (click)="setStatusFilter('pending')" 
+            class="filter-pill" 
+            [class.active]="statusFilter === 'pending'">
+            Pending
+          </button>
+          <button 
+            (click)="setStatusFilter('in-progress')" 
+            class="filter-pill" 
+            [class.active]="statusFilter === 'in-progress'">
+            In Progress
+          </button>
+          <button 
+            (click)="setStatusFilter('completed')" 
+            class="filter-pill" 
+            [class.active]="statusFilter === 'completed'">
+            Completed
+          </button>
+        </div>
+        <!-- Additional filters can be added here -->
+      </div>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <div class="loader"></div>
+      <p>Loading assignments...</p>
+    </div>
+  } @else {
+    @if (assignments.length > 0) {
+      <div class="assignments-grid">
+        @for (assignment of assignments; track assignment.id) {
+          <div class="assignment-card" [class]="getStatusClass(assignment.status)">
+            <div class="assignment-header">
+              <span class="course-id">{{ assignment.courseId }}</span>
+              <span class="status-badge">{{ assignment.status | titlecase }}</span>
+            </div>
+            <h3 class="assignment-title">{{ assignment.title }}</h3>
+            <p class="assignment-desc">{{ assignment.description }}</p>
+            <div class="assignment-details">
+              <div class="detail-item">
+                <span class="detail-label">Due:</span>
+                <span class="detail-value">{{ formatDate(assignment.dueDate) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Est. Hours:</span>
+                <span class="detail-value">{{ assignment.estimatedHours }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">TAs Assigned:</span>
+                <span class="detail-value">{{ assignment.assignedTAs.length }}</span>
+              </div>
+            </div>
+            <div class="assignment-footer">
+              @if (getRemainingDays(assignment.dueDate) >= 0) {
+                <span class="days-remaining" [class]="getDaysRemainingClass(getRemainingDays(assignment.dueDate))">
+                  {{ getRemainingDays(assignment.dueDate) }} days remaining
+                </span>
+              } @else {
+                <span class="days-remaining overdue">
+                  Overdue by {{ Math.abs(getRemainingDays(assignment.dueDate)) }} days
+                </span>
+              }
+              <a [routerLink]="['/assignments', assignment.id]" class="view-btn">View Details</a>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="no-data">
+        <p>No assignments found matching your criteria.</p>
+        <a routerLink="/assignments/add" class="btn primary">Create New Assignment</a>
+      </div>
+    }
+  }
+</div> 
