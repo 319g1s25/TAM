@@ -1,0 +1,130 @@
+<div class="performance-reports-container">
+  <div class="header-section">
+    <h1 class="page-title">TA Workload Dashboard</h1>
+    <p class="subtitle">Track and analyze teaching assistant workload and activities</p>
+    <div class="action-buttons">
+      <a routerLink="/workload/add" class="add-workload-btn">
+        <svg class="icon-plus" viewBox="0 0 24 24" width="16" height="16">
+          <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+        </svg>
+        Log Hours
+      </a>
+    </div>
+  </div>
+  
+  <div class="filter-section">
+    <div class="period-selector">
+      <h2 class="section-title">Time Period</h2>
+      <div class="period-buttons">
+        @for (period of timePeriods; track period.value) {
+          <button 
+            (click)="changePeriod(period.value)" 
+            class="period-button" 
+            [class.active]="selectedPeriod === period.value">
+            {{ period.label }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <div class="loader"></div>
+      <p>Loading workload data...</p>
+    </div>
+  } @else {
+    <div class="dashboard-grid">
+      <!-- Summary Cards -->
+      <div class="summary-section">
+        <div class="metric-card primary">
+          <div class="metric-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm1-8.5V7h-2v5.5H7l5 5 5-5h-4z"></path>
+            </svg>
+          </div>
+          <div class="metric-content">
+            <h3 class="metric-label">Total Hours</h3>
+            <p class="metric-value">{{ getTotalHoursAll() | number:'1.0-0' }}</p>
+            <p class="metric-context">{{ getAverageHoursPerTA() | number:'1.1-1' }} hours per TA on average</p>
+          </div>
+        </div>
+        
+        <div class="metric-card tertiary">
+          <div class="metric-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path fill="currentColor" d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3zm0 2c-2.3 0-7 1.2-7 3.5V19h14v-2.5c0-2.3-4.7-3.5-7-3.5z"></path>
+            </svg>
+          </div>
+          <div class="metric-content">
+            <h3 class="metric-label">Active TAs</h3>
+            <p class="metric-value">{{ taSummaries.length }}</p>
+            <p class="metric-context">across multiple courses</p>
+          </div>
+        </div>
+        
+        <div class="metric-card secondary">
+          <div class="metric-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path fill="currentColor" d="M21 5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V16c1.55-.95 3.95-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v-10zM4.5 6.5C3.3 6.5 2.1 6.65 1 7v10c1.1-.35 2.3-.5 3.5-.5 1.56 0 4.15.65 5.5 1.5v-10c-1.35-.85-3.94-1.5-5.5-1.5z"></path>
+            </svg>
+          </div>
+          <div class="metric-content">
+            <h3 class="metric-label">Course Coverage</h3>
+            <p class="metric-value">{{ getUniqueCourseCount() }}</p>
+            <p class="metric-context">courses with active TAs</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Detailed Table Section -->
+      <div class="table-section">
+        <h2 class="section-title">TA Workload Details</h2>
+        <div class="table-container">
+          <table class="performance-table">
+            <thead>
+              <tr>
+                <th>TA Name</th>
+                <th>Hours Worked</th>
+                <th>Courses</th>
+                <th>Main Activity</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ta of taSummaries; track ta.taId) {
+                <tr class="table-row">
+                  <td class="name-cell">{{ ta.taName }}</td>
+                  <td>
+                    <div class="progress-container">
+                      <div class="progress-bar" [style.width.%]="getHoursPercentage(ta.totalHours)"></div>
+                      <span class="progress-value">{{ ta.totalHours | number:'1.0-1' }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="courses-container">
+                      @for (course of getCourseBreakdownForTA(ta.taId).slice(0, 3); track course.course) {
+                        <span class="course-badge">{{ course.course }}</span>
+                      }
+                      @if (getCourseBreakdownForTA(ta.taId).length > 3) {
+                        <span class="more-badge">+{{ getCourseBreakdownForTA(ta.taId).length - 3 }}</span>
+                      }
+                    </div>
+                  </td>
+                  <td>{{ getMostCommonTaskForTA(ta.taId) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- No data message -->
+      @if (taSummaries.length === 0) {
+        <div class="no-data">
+          <p>No workload data available for the selected period.</p>
+          <a routerLink="/workload/add" class="btn primary">Log Your Hours</a>
+        </div>
+      }
+    </div>
+  }
+</div> 

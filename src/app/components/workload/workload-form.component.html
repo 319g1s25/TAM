@@ -1,0 +1,122 @@
+<div class="workload-form-container">
+  <div class="form-header">
+    <h1 class="form-title">Record Your Work Hours</h1>
+    <p class="form-subtitle">Log the time you've spent on teaching assistant duties</p>
+  </div>
+
+  <form [formGroup]="workloadForm" (ngSubmit)="submitWorkload()" class="workload-form">
+    <!-- Success message -->
+    @if (submitSuccess) {
+      <div class="alert success">
+        <div class="alert-icon">✓</div>
+        <div class="alert-content">
+          <h3>Success!</h3>
+          <p>Your workload has been recorded. Redirecting to reports...</p>
+        </div>
+      </div>
+    }
+
+    <!-- Error message -->
+    @if (submitError) {
+      <div class="alert error">
+        <div class="alert-icon">!</div>
+        <div class="alert-content">
+          <h3>Error</h3>
+          <p>{{ errorMessage }}</p>
+        </div>
+      </div>
+    }
+
+    <div class="form-grid">
+      <!-- Course Selection -->
+      <div class="form-group">
+        <label for="courseId">Course <span class="required">*</span></label>
+        <select id="courseId" formControlName="courseId" class="form-control">
+          <option value="" disabled selected>Select a course</option>
+          @for (course of courses; track course.id) {
+            <option [value]="course.id">{{ course.name }} ({{ course.id }})</option>
+          }
+        </select>
+        @if (hasError('courseId', 'required')) {
+          <div class="error-message">
+            Please select a course
+          </div>
+        }
+      </div>
+
+      <!-- Task Type -->
+      <div class="form-group">
+        <label for="taskType">Task Type <span class="required">*</span></label>
+        <select id="taskType" formControlName="taskType" class="form-control">
+          <option value="" disabled selected>Select task type</option>
+          @for (task of taskTypes; track task.id) {
+            <option [value]="task.id">{{ task.name }}</option>
+          }
+        </select>
+        @if (hasError('taskType', 'required')) {
+          <div class="error-message">
+            Please select a task type
+          </div>
+        }
+      </div>
+
+      <!-- Date -->
+      <div class="form-group">
+        <label for="date">Date <span class="required">*</span></label>
+        <input type="date" id="date" formControlName="date" class="form-control">
+        @if (hasError('date', 'required')) {
+          <div class="error-message">
+            Please select a date
+          </div>
+        }
+      </div>
+
+      <!-- Hours Spent -->
+      <div class="form-group">
+        <label for="hoursSpent">Hours Spent <span class="required">*</span></label>
+        <input type="number" id="hoursSpent" formControlName="hoursSpent" class="form-control" min="0.5" max="12" step="0.5">
+        @if (hasError('hoursSpent', 'required')) {
+          <div class="error-message">
+            Please enter hours spent
+          </div>
+        }
+        @if (hasError('hoursSpent', 'min')) {
+          <div class="error-message">
+            Minimum time is 0.5 hours
+          </div>
+        }
+        @if (hasError('hoursSpent', 'max')) {
+          <div class="error-message">
+            Maximum time is 12 hours
+          </div>
+        }
+      </div>
+
+      <!-- Description -->
+      <div class="form-group full-width">
+        <label for="description">Description</label>
+        <textarea id="description" formControlName="description" class="form-control" rows="3" 
+                  placeholder="Briefly describe what you worked on..."></textarea>
+        @if (hasError('description', 'maxlength')) {
+          <div class="error-message">
+            Description too long (max 300 characters)
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" (click)="resetForm()" class="btn secondary">Reset</button>
+      <button type="submit" class="btn primary" [disabled]="isSubmitting">
+        @if (isSubmitting) {
+          <span class="spinner"></span>
+        }
+        {{ isSubmitting ? 'Submitting...' : 'Submit Workload' }}
+      </button>
+    </div>
+  </form>
+
+  <div class="form-footer">
+    <p>Having issues logging your hours? Contact your course coordinator.</p>
+  </div>
+</div> 
