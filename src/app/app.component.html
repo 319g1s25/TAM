@@ -1,23 +1,21 @@
-<!-- Simple layout for troubleshooting -->
-<div class="app-container">
-  <!-- Top Navigation - Only show when not on login page -->
-  <nav class="top-nav" *ngIf="!isLoginPage">
-    <div class="nav-brand">
-      <span>TAM</span>
+<!-- Main app layout -->
+<div class="app-layout">
+  <!-- Sidebar - Only show when not on login page -->
+  <app-sidebar *ngIf="!isLoginPage" (sidebarToggled)="onSidebarToggle($event)"></app-sidebar>
+  
+  <!-- Main content area -->
+  <div class="main-content" [class.expanded]="sidebarCollapsed">
+    <!-- Top Navigation - Only show when not on login page -->
+    <header class="main-header" *ngIf="!isLoginPage">
+      <h1 class="page-title">{{title}}</h1>
+      <div class="user-info" *ngIf="authService.currentUser">
+        <span class="username">{{ getCurrentUserName() }}</span>
+      </div>
+    </header>
+    
+    <!-- Content -->
+    <div class="content" [class.login-page]="isLoginPage">
+      <router-outlet></router-outlet>
     </div>
-    <ul class="nav-menu">
-      <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
-      <li><a routerLink="/performance-reports" routerLinkActive="active">Performance Reports</a></li>
-      <li><a routerLink="/assignments" routerLinkActive="active">Assignments</a></li>
-      <li><a routerLink="/workload/add" routerLinkActive="active">Log Hours</a></li>
-      <li><a routerLink="/tas" routerLinkActive="active">Teaching Assistants</a></li>
-      <li><a routerLink="/courses" routerLinkActive="active">Courses</a></li>
-      <li><a (click)="logout()" class="logout-link">Logout</a></li>
-    </ul>
-  </nav>
-
-  <!-- Main Content -->
-  <main class="content" [class.login-page]="isLoginPage">
-    <router-outlet></router-outlet>
-  </main>
+  </div>
 </div>

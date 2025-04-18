@@ -4,28 +4,42 @@ import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { DatabaseService } from './database.service';
 
 export interface User {
   id: string;
-  email: string;
   name: string;
+  email: string;
   role: 'admin' | 'coordinator' | 'ta';
-  token?: string;
+}
+
+export interface LoginResponse {
+  user: User;
+  token: string;
+  expiresIn: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
+  private currentUserSubject: BehaviorSubject<User | null>;
+  public currentUser: Observable<User | null>;
   private tokenExpirationTimer: any;
-  private apiUrl = environment.apiUrl;
+  private apiUrl = 'http://localhost:3000/api';
+  private useMockData = true; // Set to false when ready to use real database
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private db: DatabaseService
   ) {
+    // Initialize from local storage if available
+    const storedUser = localStorage.getItem('currentUser');
+    this.currentUserSubject = new BehaviorSubject<User | null>(
+      storedUser ? JSON.parse(storedUser) : null
+    );
+    this.currentUser = this.currentUserSubject.asObservable();
     this.loadStoredUser();
   }
 
@@ -48,59 +62,80 @@ export class AuthService {
     }
   }
 
-  get currentUser(): User | null {
+  public get currentUserValue(): User | null {
     return this.currentUserSubject.value;
   }
 
-  get isLoggedIn(): boolean {
-    return !!this.currentUserSubject.value;
+  public get isLoggedIn(): boolean {
+    return !!this.currentUserValue;
   }
 
-  get userRole(): string | null {
-    return this.currentUserSubject.value?.role || null;
+  public get isAdmin(): boolean {
+    return this.currentUserValue?.role === 'admin';
   }
 
-  login(username: string, password: string): Observable<User> {
+  public get isCoordinator(): boolean {
+    return this.currentUserValue?.role === 'coordinator';
+  }
+
+  public get isTA(): boolean {
+    return this.currentUserValue?.role === 'ta';
+  }
+
+  // Login method - accepts email and password
+  login(email: string, password: string): Observable<User> {
+    if (this.useMockData) {
+      return this.mockLogin(email, password);
+    } else {
+      // Real database login
+      return this.http.post<any>(`${this.apiUrl}/auth/login`, { email, password })
+        .pipe(
+          map(response => {
+            if (response.success && response.user) {
+              // Store user details and token in local storage
+              localStorage.setItem('currentUser', JSON.stringify(response.user));
+              this.currentUserSubject.next(response.user);
+              return response.user;
+            } else {
+              throw new Error(response.message || 'Login failed');
+            }
+          }),
+          catchError(error => {
+            console.error('Login error:', error);
+            return throwError(() => new Error(error.message || 'Invalid credentials'));
+          })
+        );
+    }
+  }
+
+  // Mock login for development until database is connected
+  private mockLogin(email: string, password: string): Observable<User> {
     // Check for demo account credentials
-    if (username === 'admin@example.com' && password === 'admin123') {
+    if (email === 'admin@example.com' && password === 'admin123') {
       return this.demoLogin('admin');
     }
-    if (username === 'coordinator@example.com' && password === 'coord123') {
+    if (email === 'coordinator@example.com' && password === 'coord123') {
       return this.demoLogin('coordinator');
     }
-    if (username === 'ta@example.com' && password === 'ta123456') {
+    if (email === 'ta@example.com' && password === 'ta123456') {
       return this.demoLogin('ta');
     }
     
     // Default demo account
-    if (username === 'demo' && password === 'password') {
+    if (email === 'demo' && password === 'password') {
       const user: User = {
-        id: 'demo-1',
-        email: 'demo@example.com',
-        name: 'Demo User',
-        role: 'ta' as const,
-        token: 'demo-token-ta'
+        id: '3',
+        name: 'Demo TA',
+        email: 'ta@example.com',
+        role: 'ta'
       };
-      this.setUserData(user, 3600);
+      this.currentUserSubject.next(user);
+      localStorage.setItem('currentUser', JSON.stringify(user));
       return of(user);
     }
     
     // If no matching credentials
-    return throwError(() => new Error('Invalid username or password'));
-    
-    /* Uncomment for real implementation
-    return this.http.post<{ user: User, token: string }>(`${this.apiUrl}/login`, { username, password })
-      .pipe(
-        tap(response => {
-          this.setUserData(response.user, response.token);
-        }),
-        map(response => response.user),
-        catchError(error => {
-          console.error('Login error', error);
-          return throwError(() => error.error?.message || 'Login failed. Please try again.');
-        })
-      );
-    */
+    return throwError(() => new Error('Invalid email or password'));
   }
 
   // Demo login for development purposes
@@ -130,21 +165,14 @@ export class AuthService {
     };
 
     const user = demoUsers[role];
-    this.setUserData(user, 3600);
-    return of(user);
-  }
-
-  private setUserData(user: User, expiresInSeconds: number): void {
+    this.currentUserSubject.next(user);
     localStorage.setItem('currentUser', JSON.stringify(user));
     
-    // Set token expiration
-    const expirationDate = new Date(
-      new Date().getTime() + expiresInSeconds * 1000
-    );
+    // Also store token expiration
+    const expirationDate = new Date(new Date().getTime() + 2 * 60 * 60 * 1000); // 2 hours
     localStorage.setItem('tokenExpiration', expirationDate.toISOString());
     
-    this.currentUserSubject.next(user);
-    this.autoLogout(expiresInSeconds * 1000);
+    return of(user);
   }
 
   private autoLogout(expirationDuration: number): void {
@@ -162,6 +190,7 @@ export class AuthService {
   }
 
   logout(): void {
+    // Remove user from local storage and set current user to null
     localStorage.removeItem('currentUser');
     localStorage.removeItem('tokenExpiration');
     this.currentUserSubject.next(null);
@@ -171,19 +200,15 @@ export class AuthService {
 
   // Guards for role-based access
   hasRole(requiredRole: string | string[]): boolean {
-    if (!this.currentUser) {
+    if (!this.currentUserValue) {
       return false;
     }
 
     if (Array.isArray(requiredRole)) {
-      return requiredRole.includes(this.currentUser.role);
+      return requiredRole.includes(this.currentUserValue.role);
     }
     
-    return this.currentUser.role === requiredRole;
-  }
-
-  public get currentUserValue() {
-    return this.currentUserSubject.value;
+    return this.currentUserValue.role === requiredRole;
   }
 
   isAuthenticated(): boolean {

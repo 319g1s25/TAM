@@ -8,6 +8,8 @@ import { CourseFormComponent } from './components/course/course-form.component';
 import { WorkloadFormComponent } from './components/workload/workload-form.component';
 import { AssignmentListComponent } from './components/assignments/assignment-list.component';
 import { AssignmentFormComponent } from './components/assignments/assignment-form.component';
+import { LeaveRequestListComponent } from './components/leave-request/leave-request-list.component';
+import { LeaveRequestFormComponent } from './components/leave-request/leave-request-form.component';
 
 export const routes: Routes = [
   // Login route (publicly accessible) - listed first for priority
@@ -85,6 +87,16 @@ export const routes: Routes = [
   { 
     path: 'assignments/:id', 
     component: AssignmentFormComponent,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'leave-requests', 
+    component: LeaveRequestListComponent,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'leave-requests/new', 
+    component: LeaveRequestFormComponent,
     canActivate: [AuthGuard]
   },
   

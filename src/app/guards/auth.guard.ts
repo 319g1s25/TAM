@@ -1,31 +1,30 @@
 import { Injectable } from '@angular/core';
-import { Router, CanActivateFn } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthGuard {
+export class AuthGuard implements CanActivate {
   constructor(
-    private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
   
-  canActivate(): boolean {
-    console.log("Auth Guard checking authentication...");
-    console.log("isLoggedIn:", this.authService.isLoggedIn);
-    
-    // For testing, temporarily return true to bypass auth
-    return true;
-    
-    /*
+  canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> | Promise<boolean> | boolean {
     if (this.authService.isLoggedIn) {
       return true;
     }
     
-    // Not logged in, redirect to login page
-    this.router.navigate(['/login']);
+    // Store the attempted URL for redirecting after login
+    const redirectUrl = state.url;
+    
+    // Navigate to the login page with redirect URL
+    this.router.navigate(['/login'], { queryParams: { redirectUrl } });
     return false;
-    */
   }
 } 

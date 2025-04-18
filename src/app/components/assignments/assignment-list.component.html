@@ -3,9 +3,9 @@
     <h1 class="page-title">TA Assignments</h1>
     <p class="subtitle">Manage and track assignments for teaching assistants</p>
     <div class="action-buttons">
-      <a routerLink="/assignments/add" class="add-assignment-btn">
-        <svg class="icon-plus" viewBox="0 0 24 24" width="16" height="16">
-          <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+      <a routerLink="/assignments/add" class="btn btn-accent">
+        <svg class="svg-icon" viewBox="0 0 24 24">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
         </svg>
         New Assignment
       </a>
@@ -96,7 +96,7 @@
     } @else {
       <div class="no-data">
         <p>No assignments found matching your criteria.</p>
-        <a routerLink="/assignments/add" class="btn primary">Create New Assignment</a>
+        <a routerLink="/assignments/add" class="btn btn-accent">Create New Assignment</a>
       </div>
     }
   }

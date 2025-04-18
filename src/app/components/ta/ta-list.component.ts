@@ -13,14 +13,19 @@ import { TAService } from '../../services/ta.service';
       <header class="content-header">
         <h1>Teaching Assistants</h1>
         <button class="btn btn-accent" routerLink="/tas/new">
-          <i class="icon">➕</i> Add New TA
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+          </svg>
+          Add New TA
         </button>
       </header>
       
       <div class="card">
         <div class="search-filter-bar">
           <div class="search-container">
-            <i class="search-icon">🔍</i>
+            <svg class="search-icon" viewBox="0 0 24 24">
+              <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+            </svg>
             <input type="text" placeholder="Search TAs..." class="form-control" (input)="onSearch($event)">
           </div>
           
@@ -72,9 +77,9 @@ import { TAService } from '../../services/ta.service';
                 </td>
                 <td>
                   <div class="action-buttons">
-                    <button class="btn btn-sm" [routerLink]="['/tas', ta.id]" title="View">👁️</button>
-                    <button class="btn btn-sm btn-accent" [routerLink]="['/tas', ta.id, 'edit']" title="Edit">✏️</button>
-                    <button class="btn btn-sm btn-danger" (click)="deleteTA(ta.id)" title="Delete">🗑️</button>
+                    <button class="btn btn-sm" [routerLink]="['/tas', ta.id]">View</button>
+                    <button class="btn btn-sm btn-accent" [routerLink]="['/tas', ta.id, 'edit']">Edit</button>
+                    <button class="btn btn-sm btn-danger-outline" (click)="deleteTA(ta.id)">Delete</button>
                   </div>
                 </td>
               </tr>
@@ -119,6 +124,9 @@ import { TAService } from '../../services/ta.service';
       left: 10px;
       top: 50%;
       transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      fill: #7f8c8d;
     }
     
     .search-container input {
@@ -202,6 +210,38 @@ import { TAService } from '../../services/ta.service';
     
     .table-container {
       overflow-x: auto;
+    }
+    
+    .table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    
+    .table th,
+    .table td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .table th {
+      font-weight: 600;
+      color: #2c3e50;
+      background-color: #f9f9f9;
+    }
+    
+    .svg-icon {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+      vertical-align: middle;
+    }
+    
+    .btn .svg-icon {
+      margin-right: 5px;
+      width: 18px;
+      height: 18px;
     }
     
     @media (max-width: 768px) {

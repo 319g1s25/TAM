@@ -3,17 +3,19 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService } from './services/auth.service';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   standalone: true,
-  imports: [CommonModule, RouterModule]
+  imports: [CommonModule, RouterModule, SidebarComponent]
 })
 export class AppComponent implements OnInit {
   title = 'Teaching Assessment Manager';
   isLoginPage = false;
+  sidebarCollapsed = false;
 
   constructor(
     private router: Router,
@@ -49,5 +51,17 @@ export class AppComponent implements OnInit {
   
   logout() {
     this.authService.logout();
+  }
+
+  onSidebarToggle(collapsed: boolean): void {
+    this.sidebarCollapsed = collapsed;
+  }
+  
+  getCurrentUserName(): string {
+    const user = this.authService.currentUserValue;
+    if (user) {
+      return user.name || 'User';
+    }
+    return 'User';
   }
 }
