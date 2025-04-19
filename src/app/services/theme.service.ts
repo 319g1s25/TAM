@@ -7,11 +7,8 @@ import { BehaviorSubject } from 'rxjs';
 export class ThemeService {
   private darkMode = new BehaviorSubject<boolean>(false);
   darkMode$ = this.darkMode.asObservable();
-  private renderer: Renderer2;
   
   constructor(rendererFactory: RendererFactory2) {
-    this.renderer = rendererFactory.createRenderer(null, null);
-    
     // Check if user previously set dark mode
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode) {
@@ -36,13 +33,13 @@ export class ThemeService {
   }
   
   setDarkMode(isDarkMode: boolean) {
-    // Apply to both html and body elements for maximum compatibility
+    // Apply the class to both document and body for maximum compatibility
     if (isDarkMode) {
-      document.documentElement.classList.add('dark-mode');
-      document.body.classList.add('dark-mode');
+      document.documentElement.classList.add('dark-theme');
+      document.body.classList.add('dark-theme');
     } else {
-      document.documentElement.classList.remove('dark-mode');
-      document.body.classList.remove('dark-mode');
+      document.documentElement.classList.remove('dark-theme');
+      document.body.classList.remove('dark-theme');
     }
     
     this.darkMode.next(isDarkMode);
