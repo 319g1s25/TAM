@@ -4,13 +4,15 @@ import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService } from './services/auth.service';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { NotificationsComponent } from './components/notifications/notifications.component';
+import { ThemeToggleComponent } from './components/theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   standalone: true,
-  imports: [CommonModule, RouterModule, SidebarComponent]
+  imports: [CommonModule, RouterModule, SidebarComponent, NotificationsComponent, ThemeToggleComponent]
 })
 export class AppComponent implements OnInit {
   title = 'Teaching Assessment Manager';

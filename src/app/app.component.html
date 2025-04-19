@@ -8,8 +8,12 @@
     <!-- Top Navigation - Only show when not on login page -->
     <header class="main-header" *ngIf="!isLoginPage">
       <h1 class="page-title">{{title}}</h1>
-      <div class="user-info" *ngIf="authService.currentUser">
-        <span class="username">{{ getCurrentUserName() }}</span>
+      <div class="header-controls">
+        <app-theme-toggle></app-theme-toggle>
+        <app-notifications></app-notifications>
+        <div class="user-info" *ngIf="authService.currentUser">
+          <span class="username">{{ getCurrentUserName() }}</span>
+        </div>
       </div>
     </header>
     
@@ -19,3 +23,17 @@
     </div>
   </div>
 </div>
+
+<!-- Add script to initialize components after Angular is loaded -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      // Create and mount components manually 
+      const themeToggleElement = document.createElement('app-theme-toggle');
+      document.getElementById('theme-toggle-container').appendChild(themeToggleElement);
+      
+      const notificationsElement = document.createElement('app-notifications');
+      document.getElementById('notifications-container').appendChild(notificationsElement);
+    }, 1000);
+  });
+</script>

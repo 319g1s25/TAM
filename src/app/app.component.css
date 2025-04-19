@@ -186,3 +186,55 @@ router-outlet + * {
     margin: 4px 8px;
   }
 }
+
+/* Add this to the CSS file */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-info {
+  margin-left: 8px;
+}
+
+#theme-toggle-container, #notifications-container {
+  display: inline-block;
+}
+
+/* Add these dark mode styles */
+.dark-mode .main-content {
+  background-color: #121212;
+}
+
+.dark-mode .content {
+  background-color: #121212;
+}
+
+.dark-mode .main-header {
+  background-color: #1e1e1e;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .page-title {
+  color: #e0e0e0;
+}
+
+.dark-mode .user-info {
+  color: #e0e0e0;
+}
+
+.dark-mode .username {
+  color: #e0e0e0;
+}
+
+/* Add this at the end to ensure dark mode works for header controls */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-info {
+  margin-left: 8px;
+}

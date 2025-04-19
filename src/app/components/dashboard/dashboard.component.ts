@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService, User } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
+import { IconComponent } from '../shared/icon.component';
 
 interface DashboardStats {
   taCount: number;
@@ -29,7 +30,7 @@ interface UrgentTask {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, IconComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
