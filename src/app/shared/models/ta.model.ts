@@ -1,7 +1,7 @@
 // src/models/ta.model.ts
 
 export class TA {
-    id!: number;
+    id?: number;
     name!: string;
     surname!: string;
     email!: string;

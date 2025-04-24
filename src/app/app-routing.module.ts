@@ -7,7 +7,7 @@ import { LeaveRequestListComponent } from './components/leave-request/leave-requ
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'login', loadComponent: () => import('./components/login/login.component').then(c => c.LoginComponent) },
+  { path: 'login', loadComponent: () => import('./components/auth/login.component').then(c => c.LoginComponent) },
   { 
     path: 'dashboard', 
     loadComponent: () => import('./components/dashboard/dashboard.component').then(c => c.DashboardComponent),

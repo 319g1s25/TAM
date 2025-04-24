@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const db = require('./db');
 const morgan = require('morgan');
+const taRoutes = require('./routes/ta.router');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,14 +17,14 @@ app.use(morgan('dev'));
 // Routes
 // TODO: Add routes here
 
+app.use('/api/ta', taRoutes); // mounted at /api/ta
+
 // Start the server
 async function startServer() {
   try {
     // Test database connection
     const connected = await db.testConnection();
     if (connected) {
-      // Initialize database with tables and demo data
-      await db.initializeDatabase();
       
       // Start listening
       app.listen(PORT, () => {

@@ -1,0 +1,163 @@
+.content-container {
+    padding: 0 15px;
+  }
+  
+  .content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .search-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .search-container {
+    position: relative;
+    flex-grow: 1;
+    min-width: 200px;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    fill: #7f8c8d;
+  }
+  
+  .search-container input {
+    padding-left: 35px;
+  }
+  
+  .filter-options {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .filter-options select {
+    min-width: 150px;
+  }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  .ms-badge {
+    background-color: #bbdefb;
+    color: #1565c0;
+  }
+  
+  .phd-badge {
+    background-color: #c8e6c9;
+    color: #2e7d32;
+  }
+  
+  .workload-container {
+    position: relative;
+    width: 100%;
+    height: 18px;
+    background-color: #f5f5f5;
+    border-radius: 9px;
+    overflow: hidden;
+  }
+  
+  .workload-bar {
+    position: absolute;
+    height: 100%;
+    background-color: var(--primary-color);
+    border-radius: 9px;
+  }
+  
+  .workload-container span {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    color: #333;
+    text-shadow: 0 0 2px rgba(255,255,255,0.8);
+  }
+  
+  .btn-sm {
+    padding: 5px 8px;
+    font-size: 0.9rem;
+  }
+  
+  .btn-danger {
+    background-color: var(--warn-color);
+  }
+  
+  .btn-danger:hover {
+    background-color: #d32f2f;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .text-center {
+    text-align: center;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  .table th,
+  .table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .table th {
+    font-weight: 600;
+    color: #2c3e50;
+    background-color: #f9f9f9;
+  }
+  
+  .svg-icon {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    vertical-align: middle;
+  }
+  
+  .btn .svg-icon {
+    margin-right: 5px;
+    width: 18px;
+    height: 18px;
+  }
+  
+  @media (max-width: 768px) {
+    .content-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .filter-options {
+      width: 100%;
+      flex-direction: column;
+    }
+  }
