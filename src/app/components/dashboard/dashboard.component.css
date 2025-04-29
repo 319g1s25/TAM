@@ -54,6 +54,7 @@
   border-radius: 8px;
   margin-right: 16px;
   background-color: var(--primary-light-color);
+  transition: background-color 0.3s ease;
 }
 
 .svg-icon {
@@ -61,12 +62,14 @@
   height: 24px;
   fill: var(--primary-color);
   vertical-align: middle;
+  transition: fill 0.3s ease;
 }
 
 .stat-content h3 {
   margin: 0;
   font-size: 0.9rem;
   color: var(--light-text-color);
+  transition: color 0.3s ease;
 }
 
 .stat-value {
@@ -74,17 +77,20 @@
   font-weight: bold;
   margin: 5px 0 0;
   color: var(--primary-color);
+  transition: color 0.3s ease;
 }
 
 .stat-context {
   font-size: 0.8rem;
   color: var(--light-text-color);
   margin: 5px 0 0;
+  transition: color 0.3s ease;
 }
 
 .stat-change {
   font-size: 0.8rem;
   margin: 5px 0 0;
+  transition: color 0.3s ease;
 }
 
 .positive {
@@ -93,6 +99,32 @@
 
 .negative {
   color: #f44336;
+}
+
+/* Dark mode specific styles */
+.dark-theme .stat-card {
+  background: var(--card-bg);
+  box-shadow: 0 2px 10px var(--shadow-color);
+}
+
+.dark-theme .stat-icon {
+  background-color: var(--bg-tertiary);
+}
+
+.dark-theme .stat-icon .svg-icon {
+  fill: var(--text-primary);
+}
+
+.dark-theme .stat-value {
+  color: var(--text-primary);
+}
+
+.dark-theme .stat-content h3 {
+  color: var(--text-secondary);
+}
+
+.dark-theme .stat-context {
+  color: var(--text-secondary);
 }
 
 /* Urgent tasks styling */
