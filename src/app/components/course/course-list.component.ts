@@ -4,6 +4,9 @@ import { RouterLink } from '@angular/router';
 import { Course } from '../../shared/models/course.model';
 import { CourseService } from '../../services/course.service';
 import { IconComponent } from '../shared/icon.component';
+import { TAService } from '../../services/ta.service';
+import { TA } from '../../shared/models/ta.model';
+import { TAAssignmentService } from '../../services/ta-assignment.service';
 
 @Component({
   selector: 'app-course-list',
@@ -13,10 +16,16 @@ import { IconComponent } from '../shared/icon.component';
     <div class="content-container">
       <header class="content-header">
         <h1>Course Management</h1>
-        <button class="btn btn-accent" routerLink="/courses/new">
-          <app-icon icon="add"></app-icon>
-          Add New Course
-        </button>
+        <div class="header-buttons">
+          <button class="btn btn-accent" routerLink="/courses/new">
+            <app-icon icon="add"></app-icon>
+            Add New Course
+          </button>
+          <button class="btn btn-primary" (click)="assignTAsAutomatically()">
+            <app-icon icon="people"></app-icon>
+            Auto-Assign TAs
+          </button>
+        </div>
       </header>
       
       <div class="stats-row">
@@ -405,16 +414,36 @@ import { IconComponent } from '../shared/icon.component';
         flex-direction: column;
       }
     }
+    
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #1565c0;
+    }
   `]
 })
 export class CourseListComponent implements OnInit {
   courses: Course[] = [];
   filteredCourses: Course[] = [];
+  tas: TA[] = [];
   
-  constructor(private courseService: CourseService) {}
+  constructor(
+    private courseService: CourseService,
+    private taService: TAService,
+    private taAssignmentService: TAAssignmentService
+  ) {}
 
   ngOnInit(): void {
     this.loadCourses();
+    this.loadTAs();
   }
   
   loadCourses(): void {
@@ -425,6 +454,17 @@ export class CourseListComponent implements OnInit {
       },
       error => {
         console.error('Error loading courses:', error);
+      }
+    );
+  }
+  
+  loadTAs(): void {
+    this.taService.getAllTAs().subscribe(
+      tas => {
+        this.tas = tas;
+      },
+      error => {
+        console.error('Error loading TAs:', error);
       }
     );
   }
@@ -514,5 +554,85 @@ export class CourseListComponent implements OnInit {
       const shortage = (course.taRequirements || 0) - (course.numberOfTAs || 0);
       return total + (shortage > 0 ? shortage : 0);
     }, 0);
+  }
+
+  assignTAsAutomatically(): void {
+    // Get courses that need TAs
+    const coursesNeedingTAs = this.courses.filter(course => 
+      (course.taRequirements || 0) > (course.numberOfTAs || 0)
+    );
+
+    if (coursesNeedingTAs.length === 0) {
+      alert('No courses need TA assignments at this time.');
+      return;
+    }
+
+    // Get available TAs
+    const availableTAs = this.tas.filter(ta => !ta.isOnLeave);
+
+    if (availableTAs.length === 0) {
+      alert('No available TAs for assignment.');
+      return;
+    }
+
+    // Generate assignments
+    const assignments = this.taAssignmentService.assignTAsAutomatically(coursesNeedingTAs, availableTAs);
+    const summary = this.taAssignmentService.generateAssignmentSummary(assignments, coursesNeedingTAs, availableTAs);
+
+    // Show assignment summary and ask for confirmation
+    let summaryText = 'Proposed TA Assignments:\n\n';
+    
+    // Show assigned courses
+    if (summary.courseAssignments.length > 0) {
+      summaryText += 'Assigned Courses:\n';
+      summary.courseAssignments.forEach(course => {
+        summaryText += `${course.courseName} (${course.courseCode}):\n`;
+        summaryText += `  Required TAs: ${course.requiredTAs}\n`;
+        summaryText += `  Assigned TAs: ${course.assignedTAs}\n`;
+        if (course.assignedTANames.length > 0) {
+          summaryText += '  Assigned TAs:\n';
+          course.assignedTANames.forEach(taName => {
+            summaryText += `    - ${taName}\n`;
+          });
+        }
+        summaryText += '\n';
+      });
+    }
+
+    // Show unassigned courses
+    if (summary.unassignedCourses.length > 0) {
+      summaryText += 'Unassigned Courses:\n';
+      summary.unassignedCourses.forEach(course => {
+        summaryText += `  ${course.courseName} (${course.courseCode}) - Needs ${course.requiredTAs} TAs\n`;
+      });
+      summaryText += '\n';
+    }
+
+    // Show TA workloads
+    summaryText += 'TA Workloads:\n';
+    summary.taWorkloads.forEach(ta => {
+      summaryText += `  ${ta.taName}: ${ta.assignedCourses} courses (${ta.totalWorkload} hours)\n`;
+    });
+
+    if (confirm(`${summaryText}\nDo you want to proceed with these assignments?`)) {
+      // Update course TA assignments
+      assignments.forEach((taIds, courseId) => {
+        const course = coursesNeedingTAs.find(c => c.id === courseId);
+        if (course) {
+          course.numberOfTAs = (course.numberOfTAs || 0) + taIds.length;
+          this.courseService.updateCourse(course).subscribe(
+            () => {
+              console.log(`Updated TA assignments for course ${course.code}`);
+            },
+            error => {
+              console.error(`Error updating course ${course.code}:`, error);
+            }
+          );
+        }
+      });
+
+      alert('TA assignments have been updated successfully.');
+      this.loadCourses(); // Refresh the course list
+    }
   }
 } 

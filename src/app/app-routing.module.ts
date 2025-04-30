@@ -85,6 +85,14 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     data: { roles: ['ta'] }
   },
+
+  // Proctoring routes
+  { 
+    path: 'proctoring', 
+    loadComponent: () => import('./components/proctoring/proctoring-list.component').then(c => c.ProctoringListComponent),
+    canActivate: [AuthGuard],
+    data: { roles: ['admin', 'coordinator'] }
+  },
   
   // Fallback route
   { path: '**', redirectTo: '/dashboard' }
