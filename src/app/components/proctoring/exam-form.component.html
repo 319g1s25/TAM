@@ -1,0 +1,51 @@
+<div class="exam-form-container">
+  <h2>Create New Exam</h2>
+  <form [formGroup]="examForm" (ngSubmit)="onSubmit()" class="exam-form">
+    <div class="form-group">
+      <label for="courseId">Course</label>
+      <select id="courseId" formControlName="courseId" class="form-control">
+        <option value="">Select a course</option>
+        <option *ngFor="let course of courses" [value]="course.id">
+          {{ course.code }} - {{ course.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="date">Exam Date</label>
+      <input type="date" id="date" formControlName="date" class="form-control">
+    </div>
+
+    <div class="form-group">
+      <label for="duration">Duration (hours)</label>
+      <input type="number" id="duration" formControlName="duration" class="form-control" min="1">
+    </div>
+
+    <div class="form-group">
+      <label for="proctorsRequired">Required Proctors</label>
+      <input type="number" id="proctorsRequired" formControlName="proctorsRequired" class="form-control" min="1">
+    </div>
+
+    <div class="form-group">
+      <label>Classrooms</label>
+      <div class="classroom-selection">
+        <div *ngFor="let classroom of classrooms" class="classroom-option">
+          <input
+            type="checkbox"
+            [id]="'classroom-' + classroom.id"
+            [checked]="selectedClassrooms.includes(classroom.id)"
+            (change)="toggleClassroomSelection(classroom.id)"
+          >
+          <label [for]="'classroom-' + classroom.id">
+            {{ classroom.name }} (Capacity: {{ classroom.capacity }})
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" [disabled]="!examForm.valid" class="btn btn-primary">Create Exam</button>
+      <button type="button" (click)="router.navigate(['/proctoring'])" class="btn btn-secondary">Cancel</button>
+    </div>
+  </form>
+</div> 

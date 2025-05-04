@@ -1,0 +1,85 @@
+<div class="proctoring-container">
+  <div class="header">
+    <h1>Manage Exams</h1>
+    <button class="btn btn-primary" (click)="createNewExam()">
+      <app-icon name="plus"></app-icon>
+      Create New Exam
+    </button>
+  </div>
+
+  <div class="stats-container">
+    <div class="stat-card">
+      <h3>Available Proctors</h3>
+      <p class="stat-value">{{ getAvailableProctors() }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Proctor Shortage</h3>
+      <p class="stat-value">{{ getProctorShortage() }}</p>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="search-box">
+      <app-icon name="search"></app-icon>
+      <input
+        type="text"
+        placeholder="Search exams..."
+        (input)="onSearch($event)"
+      >
+    </div>
+
+    <div class="filter-group">
+      <select (change)="filterByDepartment($event)">
+        <option value="">All Departments</option>
+        <option value="CS">Computer Science</option>
+        <option value="MA">Mathematics</option>
+        <option value="PH">Physics</option>
+      </select>
+
+      <select (change)="filterByDate($event)">
+        <option value="">All Dates</option>
+        <option value="upcoming">Upcoming</option>
+        <option value="past">Past</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="exams-list">
+    <div *ngFor="let exam of filteredExams" class="exam-card">
+      <div class="exam-header">
+        <span class="department-badge" [ngClass]="getDepartmentClass(getCourseCode(exam.courseID))">
+          {{ getCourseCode(exam.courseID) }}
+        </span>
+        <span class="status-badge">pending</span>
+      </div>
+
+      <div class="exam-content">
+        <h3>{{ getCourseName(exam.courseID) }}</h3>
+        <p class="exam-date">
+          <app-icon name="calendar"></app-icon>
+          {{ exam.date | date:'mediumDate' }}
+        </p>
+        <p class="exam-duration">
+          <app-icon name="clock"></app-icon>
+          Duration: {{ exam.duration }} hours
+        </p>
+        <p class="exam-proctors">
+          <app-icon name="users"></app-icon>
+          Proctors: {{ assignedCounts[exam.id] || 0 }}/{{ exam.proctorsRequired }}
+        </p>
+        <p class="exam-classrooms">
+          <app-icon name="building"></app-icon>
+          Classrooms: {{ classroomCounts[exam.id] || 0 }}
+        </p>
+      </div>
+
+      <div class="exam-actions">
+        <button
+          class="btn btn-primary"
+          (click)="assignProctors(exam.id)">
+          Assign Proctors
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -13,7 +13,18 @@ export interface DashboardStats {
   reportCount: number;
   leaveRequestCount: number;
   pendingWorkloadCount: number;
+  examCount: number;
 }
+
+/*export interface UrgentTask {
+  title: string;
+  description: string;
+  deadline: Date;
+  priority: 'high' | 'medium' | 'low';
+  category: string;
+  actionLink: string;
+  actionText: string;
+}*/
 
 @Injectable({
   providedIn: 'root'
@@ -26,4 +37,8 @@ export class DashboardService {
   getStats(): Observable<{ success: boolean; stats: DashboardStats }> {
     return this.http.get<{ success: boolean; stats: DashboardStats }>(this.apiUrl);
   }
+
+  /*getUrgentTasks(): Observable<UrgentTask[]> {
+    return this.http.get<UrgentTask[]>(`${this.apiUrl}/urgent-tasks`);
+  }*/
 }

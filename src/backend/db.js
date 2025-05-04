@@ -46,5 +46,6 @@ async function query(sql, params) {
 
 module.exports = {
   query,
-  testConnection
+  testConnection,
+  getConnection: () => pool.getConnection()
 };

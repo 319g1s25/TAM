@@ -53,7 +53,7 @@
     </div>
   </div>
   
-  <div class="upcoming-tasks">
+  <!-- <div class="upcoming-tasks">
     <h2>Tasks Requiring Attention</h2>
     <div class="task-list">
       <div class="task-card" *ngFor="let task of urgentTasks">
@@ -72,7 +72,7 @@
         <p>No urgent tasks requiring attention</p>
       </div>
     </div>
-  </div>
+  </div> -->
   
   <div class="dashboard-grid">
     <div class="card">
@@ -120,6 +120,18 @@
       <div class="card-actions">
         <a routerLink="/assignments" class="btn btn-primary">View Assignments</a>
         <a routerLink="/assignments/add" class="btn btn-outline">Add New</a>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <h2>Exam Management</h2>
+        <span class="card-badge">{{ stats.examCount || 0 }}</span>
+      </div>
+      <p>Schedule exams and manage proctoring assignments</p>
+      <div class="card-actions">
+        <a routerLink="/proctoring" class="btn btn-primary">View Exams</a>
+        <a routerLink="/proctoring/new" class="btn btn-outline">Schedule Exam</a>
       </div>
     </div>
     

@@ -23,7 +23,7 @@ const routes: Routes = [
   { 
     path: 'tas/new', 
     loadComponent: () => import('./components/ta/ta-form.component').then(c => c.TAFormComponent),
-    canActivate: [AuthGuard],
+    canActivate: [RoleGuard],
     data: { roles: ['admin', 'coordinator'] } 
   },
   { 
@@ -34,7 +34,7 @@ const routes: Routes = [
   { 
     path: 'tas/:id/edit', 
     loadComponent: () => import('./components/ta/ta-form.component').then(c => c.TAFormComponent),
-    canActivate: [AuthGuard],
+    canActivate: [RoleGuard],
     data: { roles: ['admin', 'coordinator'] } 
   },
   { 
@@ -45,7 +45,7 @@ const routes: Routes = [
   { 
     path: 'assignments/add', 
     loadComponent: () => import('./components/assignments/assignment-form.component').then(c => c.AssignmentFormComponent),
-    canActivate: [AuthGuard],
+    canActivate: [RoleGuard],
     data: { roles: ['admin', 'coordinator'] } 
   },
   { 
@@ -67,7 +67,7 @@ const routes: Routes = [
   {
     path: 'courses/:id/edit',
     loadComponent: () => import('./components/course/course-form.component').then(c => c.CourseFormComponent),
-    canActivate: [AuthGuard],
+    canActivate: [RoleGuard],
     data: { roles: ['admin', 'coordinator'] } 
   },
   {
@@ -88,7 +88,7 @@ const routes: Routes = [
   {
     path: 'workload/instructor',
     loadComponent: () => import('./components/workload/instructor-workload.component').then(c => c.InstructorWorkloadComponent),
-    canActivate: [AuthGuard],
+    canActivate: [RoleGuard],
     data: { roles: ['instructor'] }
   },
   
@@ -101,7 +101,7 @@ const routes: Routes = [
   { 
     path: 'leave-requests/new', 
     component: LeaveRequestFormComponent, 
-    canActivate: [AuthGuard],
+    canActivate: [RoleGuard],
     data: { roles: ['ta'] }
   },
 
@@ -109,8 +109,20 @@ const routes: Routes = [
   { 
     path: 'proctoring', 
     loadComponent: () => import('./components/proctoring/proctoring-list.component').then(c => c.ProctoringListComponent),
-    canActivate: [AuthGuard],
-    data: { roles: ['admin', 'coordinator'] }
+    canActivate: [RoleGuard],
+    data: { roles: ['authstaff', 'deansoffice', 'departmentchair', 'instructor'] }
+  },
+  { 
+    path: 'proctoring/new', 
+    loadComponent: () => import('./components/proctoring/exam-form.component').then(c => c.ExamFormComponent),
+    canActivate: [RoleGuard],
+    data: { roles: ['authstaff', 'deansoffice', 'departmentchair', 'instructor'] }
+  },
+  { 
+    path: 'proctoring/assign/:id', 
+    loadComponent: () => import('./components/proctoring/proctor-assignment.component').then(c => c.ProctorAssignmentComponent),
+    canActivate: [RoleGuard],
+    data: { roles: ['authstaff', 'deansoffice', 'departmentchair', 'instructor'] }
   },
   
   // Fallback route

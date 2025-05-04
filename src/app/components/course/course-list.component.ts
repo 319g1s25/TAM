@@ -117,7 +117,7 @@ export class CourseListComponent implements OnInit {
   
   getTAShortage(): number {
     return this.courses.reduce((total, course) => {
-      const shortage = (course.taRequirements || 0) - (course.numberOfTAs || 0);
+      const shortage = (course.ta_required || 0) - (course.numberOfTAs || 0);
       return total + (shortage > 0 ? shortage : 0);
     }, 0);
   }

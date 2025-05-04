@@ -9,6 +9,9 @@ const courseRoutes = require('./routes/course.router');
 const workloadRoutes = require('./routes/workload.router');
 const authRoutes = require('./routes/auth.router');
 const dashboardRoutes = require('./routes/dashboard.router');
+const taAssignmentRoutes = require('./routes/ta-assignment.router');
+const examRoutes = require('./routes/exam.router');
+console.log('Exam routes:', examRoutes);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,6 +28,8 @@ app.use('/api/ta', taRoutes); // mounted at /api/tas
 app.use('/api/workload', workloadRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/ta-assignments', taAssignmentRoutes);
+app.use('/api/exams', examRoutes);
 
 // Start the server
 async function startServer() {

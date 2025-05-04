@@ -1,22 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { IconComponent } from '../shared/icon.component';
+import { User } from '../../shared/models/user.model';
 import { AuthService } from '../../services/auth.service';
 import { DashboardService, DashboardStats } from '../../services/dashboard.service';
-import { WorkloadService } from '../../services/workload.service';
-import { User } from '../../shared/models/user.model';
-import { IconComponent } from '../shared/icon.component';
-
-interface UrgentTask {
-  title: string;
-  description: string;
-  deadline: Date;
-  priority: 'high' | 'medium' | 'low';
-  category: string;
-  actionLink: string;
-  actionText: string;
-}
+//import {  UrgentTask } from '../../services/dashboard.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -27,45 +17,70 @@ interface UrgentTask {
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
-  welcomeMessage: string = 'Welcome to your TA Management Dashboard';
-  private userSubscription: Subscription | null = null;
-
+  welcomeMessage = 'Welcome to your Dashboard';
   stats: DashboardStats = {
     taCount: 0,
-    taChange: 0,
     courseCount: 0,
-    activeCourseCount: 0,
     assignmentCount: 0,
     pendingAssignmentCount: 0,
+    activeCourseCount: 0,
     avgWorkload: 0,
+    pendingWorkloadCount: 0,
     reportCount: 0,
     leaveRequestCount: 0,
-    pendingWorkloadCount: 0
+    examCount: 0,
+    taChange: 0
   };
-
-  urgentTasks: UrgentTask[] = [];
+  //urgentTasks: UrgentTask[] = [];
+  private userSubscription: Subscription | null = null;
 
   constructor(
     public authService: AuthService,
-    private dashboardService: DashboardService,
-    private workloadService: WorkloadService
+    private dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
-    this.userSubscription = this.authService.currentUser.subscribe(user => {
+    this.userSubscription = this.authService.currentUser.subscribe((user: User | null) => {
       this.currentUser = user;
       this.updateWelcomeMessage();
-      this.loadDashboardStats();
+    });
 
-      if (user?.role === 'instructor') {
-        this.loadInstructorPendingWorkload();
+    this.loadStats();
+    //this.loadUrgentTasks();
+  }
+
+  ngOnDestroy(): void {
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+  }
+
+  private loadStats(): void {
+    this.dashboardService.getStats().subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.stats = {
+            ...res.stats,
+            examCount: res.stats.examCount || 0
+          };
+        }
+      },
+      error: (error: Error) => {
+        console.error('Error loading dashboard stats:', error);
       }
     });
   }
 
-  ngOnDestroy(): void {
-    this.userSubscription?.unsubscribe();
-  }
+  /*private loadUrgentTasks(): void {
+    this.dashboardService.getUrgentTasks().subscribe({
+      next: (tasks: UrgentTask[]) => {
+        this.urgentTasks = tasks;
+      },
+      error: (error: Error) => {
+        console.error('Error loading urgent tasks:', error);
+      }
+    });
+  }*/
 
   private updateWelcomeMessage(): void {
     if (this.currentUser) {
@@ -89,46 +104,5 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.welcomeMessage = 'Welcome to your Dashboard';
       }
     }
-  }
-
-  private loadDashboardStats(): void {
-    this.dashboardService.getStats().subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.stats = res.stats;
-        }
-      },
-      error: (err) => {
-        console.error('Failed to fetch dashboard stats:', err);
-      }
-    });
-  }
-
-  private loadInstructorPendingWorkload(): void {
-    if (!this.currentUser) return;
-
-    this.workloadService.getInstructorWorkload(this.currentUser.id).subscribe({
-      next: (response) => {
-        if (response.success) {
-          const pendingCount = response.workload.filter(entry => entry.approved === null).length;
-          this.stats.pendingWorkloadCount = pendingCount;
-
-          if (pendingCount > 0) {
-            this.urgentTasks.unshift({
-              title: 'Pending Workload Approvals',
-              description: `You have ${pendingCount} workload entries waiting for your approval`,
-              deadline: new Date(new Date().setDate(new Date().getDate() + 1)),
-              priority: 'high',
-              category: 'Workload',
-              actionLink: '/workload/instructor',
-              actionText: 'Review Entries'
-            });
-          }
-        }
-      },
-      error: (err) => {
-        console.error('Error loading instructor workload:', err);
-      }
-    });
   }
 }

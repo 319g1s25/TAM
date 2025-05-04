@@ -16,40 +16,47 @@ export class RoleGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> | Promise<boolean> | boolean {
-    // First check if the user is authenticated
+    console.log('🛡️ RoleGuard triggered for:', state.url);
+  
     if (!this.authService.isLoggedIn) {
+      console.warn('🚫 Not logged in. Redirecting to /login');
       this.router.navigate(['/login']);
       return false;
     }
-    
-    // Get the roles required for the route
+  
     const requiredRoles = route.data['roles'] as string[];
-    
-    // If no roles specified, allow access
+    console.log('🔐 Required roles:', requiredRoles);
+    console.log('👤 Current role flags:', {
+      isInstructor: this.authService.isInstructor,
+      isAuthStaff: this.authService.isAuthStaff,
+      isDepartmentChair: this.authService.isDepartmentChair,
+      isDeansOffice: this.authService.isDeansOffice,
+      isTA: this.authService.isTA
+    });
+  
     if (!requiredRoles || requiredRoles.length === 0) {
+      console.log('✅ No role restrictions, access granted');
       return true;
     }
-    
-    // Check if the user has at least one of the required roles
+  
     const hasRole = requiredRoles.some(role => {
       switch (role) {
-        case 'admin':
-          return this.authService.isAdmin;
-        case 'coordinator':
-          return this.authService.isCoordinator;
-        case 'ta':
-          return this.authService.isTA;
-        default:
-          return false;
+        case 'authstaff': return this.authService.isAuthStaff;
+        case 'deansoffice': return this.authService.isDeansOffice;
+        case 'departmentchair': return this.authService.isDepartmentChair;
+        case 'instructor': return this.authService.isInstructor;
+        case 'ta': return this.authService.isTA;
+        default: return false;
       }
     });
-    
-    if (hasRole) {
-      return true;
-    }
-    
-    // If not, redirect to dashboard
+  
+    console.log(`✅ Role check result for '${state.url}':`, hasRole);
+  
+    if (hasRole) return true;
+  
+    console.warn('🚫 Access denied. Redirecting to /dashboard');
     this.router.navigate(['/dashboard']);
     return false;
   }
+  
 } 
