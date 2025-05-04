@@ -4,6 +4,11 @@ const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const db = require('./db');
 const morgan = require('morgan');
+const taRoutes = require('./routes/ta.router');
+const courseRoutes = require('./routes/course.router');
+const workloadRoutes = require('./routes/workload.router');
+const authRoutes = require('./routes/auth.router');
+const dashboardRoutes = require('./routes/dashboard.router');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +20,11 @@ app.use(morgan('dev'));
 
 // Routes
 // TODO: Add routes here
+app.use('/api/courses', courseRoutes); 
+app.use('/api/ta', taRoutes); // mounted at /api/tas
+app.use('/api/workload', workloadRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Start the server
 async function startServer() {
@@ -22,8 +32,6 @@ async function startServer() {
     // Test database connection
     const connected = await db.testConnection();
     if (connected) {
-      // Initialize database with tables and demo data
-      await db.initializeDatabase();
       
       // Start listening
       app.listen(PORT, () => {

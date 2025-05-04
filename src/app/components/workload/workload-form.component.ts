@@ -2,12 +2,16 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { WorkloadService, WorkloadEntry } from '../../services/workload.service';
+import { WorkloadService } from '../../services/workload.service';
+import { WorkloadEntry } from '../../shared/models/task.model';
+import {Course} from '../../shared/models/course.model';
+import { HttpClientModule } from '@angular/common/http';
+import { AuthService } from '../../services/auth.service';;
 
 @Component({
   selector: 'app-workload-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, HttpClientModule],
   templateUrl: './workload-form.component.html',
   styleUrls: ['./workload-form.component.css']
 })
@@ -17,6 +21,8 @@ export class WorkloadFormComponent implements OnInit {
   submitSuccess = false;
   submitError = false;
   errorMessage = '';
+  courses: Course[] = [];
+  currentTaId: string = '';
 
   taskTypes = [
     { id: 'grading', name: 'Grading Assignments/Quizzes' },
@@ -28,37 +34,43 @@ export class WorkloadFormComponent implements OnInit {
     { id: 'other', name: 'Other Tasks' }
   ];
 
-  // Mock courses - in a real app this would come from a service
-  courses = [
-    { id: 'CS101', name: 'Introduction to Computer Science' },
-    { id: 'CS205', name: 'Data Structures' },
-    { id: 'CS301', name: 'Algorithms' },
-    { id: 'CS401', name: 'Database Systems' },
-    { id: 'CS201', name: 'Object-Oriented Programming' }
-  ];
-
   constructor(
     private fb: FormBuilder,
     private workloadService: WorkloadService,
+    private authService: AuthService, 
     private router: Router
   ) {
     this.workloadForm = this.fb.group({
-      taId: ['', Validators.required], // In a real app, this would be the logged-in user's ID
-      taName: ['', Validators.required], // This would be auto-filled
-      courseId: ['', Validators.required],
-      taskType: ['', Validators.required],
+      courseID: ['', Validators.required],
+      taID: ['', Validators.required],
+      hoursspent: ['', [Validators.required, Validators.min(0.5), Validators.max(12)]],
       date: [this.getCurrentDate(), Validators.required],
-      hoursSpent: ['', [Validators.required, Validators.min(0.5), Validators.max(12)]],
-      description: ['', Validators.maxLength(300)]
+      description: ['', Validators.maxLength(300)],
+      tasktype: ['', Validators.required]
     });
   }
 
   ngOnInit(): void {
-    // In a real app, we would get the user's info and populate the form
+    // Get courses from backend
+    this.workloadService.getCourses().subscribe({
+      next: (response) => {
+        console.log('Courses fetched:', response);
+        this.courses = response; // ✅ Handle raw array
+      },
+      error: (error) => {
+        console.error('HTTP error fetching courses:', error);
+        this.errorMessage = 'Failed to load courses. Please try again later.';
+      }
+    });    
+
+    // Get TA info from session
+    const currentUser = this.authService.currentUserValue;
+  if (currentUser && currentUser.role === 'ta') {
+    this.currentTaId = currentUser.id;
     this.workloadForm.patchValue({
-      taId: 'TA123',
-      taName: 'John Doe'
+      taID: currentUser.id
     });
+  }
   }
 
   getCurrentDate(): string {
@@ -70,56 +82,47 @@ export class WorkloadFormComponent implements OnInit {
   }
 
   submitWorkload(): void {
+    console.log('Submit triggered');
     if (this.workloadForm.invalid) {
-      // Mark all fields as touched to show validation errors
-      Object.keys(this.workloadForm.controls).forEach(key => {
-        const control = this.workloadForm.get(key);
-        control?.markAsTouched();
-      });
+      this.workloadForm.markAllAsTouched();
+      console.warn('Form is invalid:', this.workloadForm.value);
       return;
     }
-
+  
     this.isSubmitting = true;
     this.submitSuccess = false;
     this.submitError = false;
-
+  
     const workloadEntry: WorkloadEntry = {
-      id: Date.now().toString(), // Generate a unique ID
+      id: 0, // Placeholder; backend generates this
       ...this.workloadForm.value,
-      timestamp: new Date().toISOString()
+      tasktype: this.workloadForm.value.tasktype,
+      date: this.workloadForm.value.date,
+      approved : null
     };
-
-    this.workloadService.addWorkloadEntry(workloadEntry).subscribe({
+  
+    this.workloadService.submitWorkload(workloadEntry).subscribe({
       next: () => {
         this.isSubmitting = false;
         this.submitSuccess = true;
         this.resetForm();
-        // After 2 seconds, redirect to workload reports
-        setTimeout(() => {
-          this.router.navigate(['/reports']);
-        }, 2000);
+        setTimeout(() => this.router.navigate(['/reports']), 2000);
       },
-      error: (err: Error) => {
+      error: (error) => {
         this.isSubmitting = false;
         this.submitError = true;
-        this.errorMessage = err.message || 'Failed to submit workload entry. Please try again.';
+        this.errorMessage = error.message || 'Failed to submit workload entry.';
       }
     });
   }
-
+  
   resetForm(): void {
-    // Reset the form but keep the TA info and date
-    const taId = this.workloadForm.get('taId')?.value;
-    const taName = this.workloadForm.get('taName')?.value;
-    
     this.workloadForm.reset({
-      taId,
-      taName,
+      ta_id: this.currentTaId,
       date: this.getCurrentDate()
     });
   }
 
-  // Helper methods for form validation
   hasError(controlName: string, errorName: string): boolean {
     const control = this.workloadForm.get(controlName);
     return !!(control && control.touched && control.hasError(errorName));

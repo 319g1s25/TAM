@@ -471,7 +471,7 @@ export class LeaveRequestListComponent implements OnInit {
   
   ngOnInit(): void {
     // Check if the user is an admin or coordinator to determine view mode
-    this.isAdminView = this.authService.isAdmin || this.authService.isCoordinator;
+    this.isAdminView = this.authService.isAuthStaff || this.authService.isDeansOffice;
     
     // Load leave requests
     this.loadLeaveRequests();

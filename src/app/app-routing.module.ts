@@ -4,10 +4,12 @@ import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 import { LeaveRequestFormComponent } from './components/leave-request/leave-request-form.component';
 import { LeaveRequestListComponent } from './components/leave-request/leave-request-list.component';
+import { AuthService } from './services/auth.service';
+import { inject } from '@angular/core';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'login', loadComponent: () => import('./components/login/login.component').then(c => c.LoginComponent) },
+  { path: 'login', loadComponent: () => import('./components/auth/login.component').then(c => c.LoginComponent) },
   { 
     path: 'dashboard', 
     loadComponent: () => import('./components/dashboard/dashboard.component').then(c => c.DashboardComponent),
@@ -62,6 +64,17 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     data: { roles: ['admin', 'coordinator'] } 
   },
+  {
+    path: 'courses/:id/edit',
+    loadComponent: () => import('./components/course/course-form.component').then(c => c.CourseFormComponent),
+    canActivate: [AuthGuard],
+    data: { roles: ['admin', 'coordinator'] } 
+  },
+  {
+    path: 'courses/:id',
+    loadComponent: () => import('./components/course/course-detail.component').then(c => c.CourseDetailComponent),
+    canActivate: [AuthGuard]
+  },
   { 
     path: 'performance-reports', 
     loadComponent: () => import('./components/performance-reports/performance-reports.component').then(c => c.PerformanceReportsComponent),
@@ -71,6 +84,12 @@ const routes: Routes = [
     path: 'workload/add', 
     loadComponent: () => import('./components/workload/workload-form.component').then(c => c.WorkloadFormComponent),
     canActivate: [AuthGuard] 
+  },
+  {
+    path: 'workload/instructor',
+    loadComponent: () => import('./components/workload/instructor-workload.component').then(c => c.InstructorWorkloadComponent),
+    canActivate: [AuthGuard],
+    data: { roles: ['instructor'] }
   },
   
   // Leave Request routes

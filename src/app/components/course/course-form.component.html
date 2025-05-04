@@ -1,0 +1,160 @@
+<div class="content-container">
+  <header class="content-header">
+    <h1>{{ isEditing ? 'Edit' : 'Add' }} Course</h1>
+    <div class="breadcrumb">
+      <a routerLink="/courses">Courses</a> /
+      <span>{{ isEditing ? 'Edit' : 'Add' }} Course</span>
+    </div>
+  </header>
+
+  <div class="card">
+    <form (ngSubmit)="onSubmit()" #courseForm="ngForm">
+      <div class="form-group-row">
+        <div class="form-group">
+          <label for="course_code">Course Code<span class="required">*</span></label>
+          <input
+            type="text"
+            id="course_code"
+            name="course_code"
+            class="form-control"
+            [(ngModel)]="course.course_code"
+            required
+            #course_code="ngModel"
+            placeholder="e.g. CS101"
+          >
+          <div *ngIf="course_code.invalid && (course_code.dirty || course_code.touched)" class="error-message">
+            Course code is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="name">Course Name<span class="required">*</span></label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            class="form-control"
+            [(ngModel)]="course.name"
+            required
+            #name="ngModel"
+            placeholder="e.g. Introduction to Computer Science"
+          >
+          <div *ngIf="name.invalid && (name.dirty || name.touched)" class="error-message">
+            Course name is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description<span class="required">*</span></label>
+        <textarea
+          id="description"
+          name="description"
+          class="form-control"
+          [(ngModel)]="course.description"
+          required
+          rows="4"
+          #description="ngModel"
+          placeholder="Enter course description..."
+        ></textarea>
+        <div *ngIf="description.invalid && (description.dirty || description.touched)" class="error-message">
+          Description is required
+        </div>
+      </div>
+
+      <div class="form-group-row">
+        <div class="form-group">
+          <label for="department">Department<span class="required">*</span></label>
+          <select
+            id="department"
+            name="department"
+            class="form-control"
+            [(ngModel)]="course.department"
+            required
+            #department="ngModel"
+          >
+            <option value="">Select Department</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Mathematics">Mathematics</option>
+            <option value="Physics">Physics</option>
+          </select>
+          <div *ngIf="department.invalid && (department.dirty || department.touched)" class="error-message">
+            Department is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="semester">Semester<span class="required">*</span></label>
+          <select
+            id="semester"
+            name="semester"
+            class="form-control"
+            [(ngModel)]="course.semester"
+            required
+            #semester="ngModel"
+          >
+            <option value="">Select Semester</option>
+            <option value="Fall 2023">Fall 2023</option>
+            <option value="Spring 2024">Spring 2024</option>
+          </select>
+          <div *ngIf="semester.invalid && (semester.dirty || semester.touched)" class="error-message">
+            Semester is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="credit">Credits
+            <span class="required">*</span></label>
+          <input
+            type="number"
+            id="credit"
+            name="credit"
+            class="form-control"
+            [(ngModel)]="course.credit"
+            required
+            min="1"
+            max="6"
+            #credit="ngModel"
+          >
+          <div *ngIf="credit.invalid && (credit.dirty || credit.touched)" class="error-message">
+            <div *ngIf="credit.errors?.['required']">Credits is required</div>
+            <div *ngIf="credit.errors?.['min'] || credit.errors?.['max']">
+              Credits must be between 1 and 6
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="ta_required">TA Requirements<span class="required">*</span></label>
+        <input
+          type="number"
+          id="ta_required"
+          name="ta_required"
+          class="form-control"
+          [(ngModel)]="course.ta_required"
+          required
+          min="0"
+          #ta_required="ngModel"
+        >
+        <div *ngIf="ta_required.invalid && (ta_required.dirty || ta_required.touched)" class="error-message">
+          <div *ngIf="ta_required.errors?.['required']">TA requirements is required</div>
+          <div *ngIf="ta_required.errors?.['min']">
+            TA requirements cannot be negative
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="isEditing" class="form-group">
+        <p><strong>ID:</strong> {{ course.id }}</p>
+      </div>
+
+      <div class="action-buttons">
+        <button type="submit" class="btn" [disabled]="courseForm.invalid">
+          {{ isEditing ? 'Update' : 'Create' }} Course
+        </button>
+        <a routerLink="/courses" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>

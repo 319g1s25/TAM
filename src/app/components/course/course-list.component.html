@@ -1,0 +1,92 @@
+<div class="content-container">
+    <header class="content-header">
+      <h1>Course Management</h1>
+      <button class="btn btn-accent" routerLink="/courses/new">
+        <app-icon icon="add"></app-icon>
+        Add New Course
+      </button>
+    </header>
+  
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <app-icon icon="book" size="large"></app-icon>
+        </div>
+        <div class="stat-content">
+          <h3>Total Courses</h3>
+          <p class="stat-value">{{ courses.length }}</p>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card">
+      <div class="search-filter-bar">
+        <div class="search-container">
+          <app-icon icon="search"></app-icon>
+          <input type="text" placeholder="Search courses..." class="form-control" (input)="onSearch($event)">
+        </div>
+  
+        <div class="filter-options">
+          <select class="form-control" (change)="filterByDepartment($event)">
+            <option value="">All Departments</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Mathematics">Mathematics</option>
+            <option value="Physics">Physics</option>
+          </select>
+  
+          <select class="form-control" (change)="filterBySemester($event)">
+            <option value="">All Semesters</option>
+            <option value="Fall 2023">Fall 2023</option>
+            <option value="Spring 2024">Spring 2024</option>
+          </select>
+        </div>
+      </div>
+  
+      <div class="course-grid">
+        <div *ngFor="let course of filteredCourses" class="course-card">
+          <div class="course-header">
+            <span class="course-code">{{ course.course_code }}</span>
+            <span [class]="'department-badge ' + getDepartmentClass(course.department)">
+              {{ course.department }}
+            </span>
+          </div>
+          <h3 class="course-title">{{ course.name }}</h3>
+          <p class="course-description">
+            {{ (course.description || '').slice(0, 100) }}{{ (course.description || '').length > 100 ? '...' : '' }}
+          </p>
+  
+          <div class="course-details">
+            <div class="detail-item">
+              <span class="detail-label">Credits:</span>
+              <span class="detail-value">{{ course.credit }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Semester:</span>
+              <span class="detail-value">{{ course.semester }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">TA Required:</span>
+              <span class="detail-value">{{ course.ta_required || 0 }}</span>
+            </div>
+          </div>
+  
+          <div class="course-actions">
+            <button class="btn btn-sm" [routerLink]="['/courses', course.id]" title="View">
+              <app-icon icon="view" size="small"></app-icon>
+            </button>
+            <button class="btn btn-sm btn-accent" [routerLink]="['/courses', course.id, 'edit']" title="Edit">
+              <app-icon icon="edit" size="small"></app-icon>
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="course.id !== undefined && deleteCourse(course.id)" title="Delete">
+              <app-icon icon="delete" size="small"></app-icon>
+            </button>
+          </div>
+        </div>
+  
+        <div *ngIf="filteredCourses.length === 0" class="no-courses">
+          <p>No courses found matching your criteria</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  

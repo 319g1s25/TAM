@@ -1,0 +1,30 @@
+to use everything with database (mysql and backend inside the docker image):
+
+* download docker desktop
+
+* run:
+docker compose down -v  # optional: reset volumes for a clean start
+docker compose up -d
+
+* to verify it worked:
+run: 
+    docker exec -it tam-mysql mysql -u root -p
+Enter password: 
+    cs319Team1.#
+run:
+    SHOW DATABASES;
+    USE ta_management;
+    SHOW TABLES;
+
+* then you can go ahead and start the app from the root folder of the project: ng serve
+
+* then you will see the login page, you can log in with 
+    ugur@bilkent.edu.tr ugur1234 for instructor
+    nazli@bilkent.edu.tr nazli1234 for ta
+    merve@bilkent.edu.tr merve1234 for authstaff
+    cinar@bilkent.edu.tr cinar1234 for deansoffice
+    begum@bilkent.edu.tr begum1234 for departments chair
+
+    there are other rows for these roles and you can ask ai to find the credentials of these roles by 
+    copy pasting the file './dbinit/tam_database.sql'
+
