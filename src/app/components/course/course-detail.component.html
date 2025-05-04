@@ -1,0 +1,59 @@
+<div class="content-container">
+  <header class="content-header">
+    <h1>Course Details</h1>
+    <div class="breadcrumb">
+      <a routerLink="/courses">Courses</a> /
+      <span>Course Details</span>
+    </div>
+  </header>
+
+  <div class="card">
+    @if (isLoading) {
+      <div class="loading-container">
+        <div class="spinner-border"></div>
+        <p>Loading course details...</p>
+      </div>
+    } @else if (error) {
+      <div class="alert alert-danger">
+        {{ error }}
+      </div>
+    } @else if (course) {
+      <div class="detail-section">
+        <div class="detail-header">
+          <h2>{{ course.name }}</h2>
+          <span class="course-code">{{ course.course_code }}</span>
+          <span [class]="'department-badge ' + getDepartmentClass(course.department)">
+            {{ course.department }}
+          </span>
+        </div>
+
+        <div class="detail-content">
+          <div class="detail-group">
+            <h3>Course Information</h3>
+            <div class="detail-row">
+              <span class="detail-label">Description:</span>
+              <span class="detail-value">{{ course.description }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Semester:</span>
+              <span class="detail-value">{{ course.semester }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Credits:</span>
+              <span class="detail-value">{{ course.credit }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">TA Required:</span>
+              <span class="detail-value">{{ course.ta_required }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn btn-accent" (click)="onEdit()">Edit Course</button>
+          <button class="btn btn-secondary" (click)="onBack()">Back to List</button>
+        </div>
+      </div>
+    }
+  </div>
+</div> 

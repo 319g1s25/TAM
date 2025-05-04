@@ -10,14 +10,20 @@ exports.getAllTAs = async (req, res) => {
   }
 };
 
-exports.getTAById = (req, res) => {
-  const id = req.params.id;
-  db.query('SELECT * FROM ta WHERE id = ?', [id], (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (results.length === 0) return res.status(404).json({ error: 'TA not found' });
-    res.json(results[0]);
-  });
+exports.getTAById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const rows = await db.query('SELECT * FROM ta WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'TA not found' });
+    }
+    res.json(rows[0]);
+  } catch (error) {
+    console.error('Error fetching TA:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
+
 
 exports.createTA = async (req, res) => {
   const {
@@ -45,14 +51,58 @@ exports.createTA = async (req, res) => {
   }
 };
 
-exports.updateTA = (req, res) => {
+exports.updateTA = async (req, res) => {
   const id = req.params.id;
-  const updatedTA = req.body;
-  db.query('UPDATE ta SET ? WHERE id = ?', [updatedTA, id], (err) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.sendStatus(204); // No content
-  });
+  if (!id) {
+    return res.status(400).json({ error: 'Missing TA ID in request URL' });
+  }
+
+  const {
+    name,
+    surname,
+    email,
+    password,
+    isOnLeave,
+    totalWorkload,
+    msOrPhdStatus,
+    proctoringEnabled,
+    department
+  } = req.body;
+
+  console.log("Received body for update:", req.body);
+console.log("TA ID from URL param:", id);
+
+  // Only include fields that are not undefined
+  const updates = {
+    name,
+    surname,
+    email,
+    password,
+    isOnLeave,
+    totalWorkload,
+    msOrPhdStatus,
+    proctoringEnabled,
+    department
+  };
+
+  const validUpdates = Object.entries(updates).filter(([_, v]) => v !== undefined);
+
+  if (validUpdates.length === 0) {
+    return res.status(400).json({ error: 'No valid fields to update' });
+  }
+
+  const setClause = validUpdates.map(([key]) => `${key} = ?`).join(', ');
+  const values = validUpdates.map(([_, value]) => value);
+
+  try {
+    await db.query(`UPDATE ta SET ${setClause} WHERE id = ?`, [...values, id]);
+    res.sendStatus(204); // No Content
+  } catch (err) {
+    console.error("Error updating TA:", err);
+    res.status(500).json({ error: 'Database error' });
+  }
 };
+
 
 exports.deleteTA = (req, res) => {
   const id = req.params.id;

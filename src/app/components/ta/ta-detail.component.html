@@ -1,1 +1,71 @@
-<p>TA detail works!</p>
+<div class="content-container">
+  <header class="content-header">
+    <h1>Teaching Assistant Details</h1>
+    <div class="breadcrumb">
+      <a routerLink="/tas">Teaching Assistants</a> /
+      <span>TA Details</span>
+    </div>
+  </header>
+
+  <div class="card">
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="spinner-border"></div>
+      <p>Loading TA details...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!isLoading && error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <!-- TA Details -->
+    <div *ngIf="!isLoading && !error && ta" class="detail-section">
+      <div class="detail-header">
+        <h2>{{ ta.name }} {{ ta.surname }}</h2>
+        <span class="status-badge" 
+              [class.ms-badge]="ta.msOrPhdStatus === 'MS'" 
+              [class.phd-badge]="ta.msOrPhdStatus === 'PhD'">
+          {{ ta.msOrPhdStatus }}
+        </span>
+      </div>
+
+      <div class="detail-content">
+        <div class="detail-group">
+          <h3>Personal Information</h3>
+          <div class="detail-row">
+            <span class="detail-label">Email:</span>
+            <span class="detail-value">{{ ta.email }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Department:</span>
+            <span class="detail-value">{{ ta.department }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Status:</span>
+            <span class="detail-value">{{ ta.isOnLeave ? 'On Leave' : 'Active' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-group">
+          <h3>Workload Information</h3>
+          <div class="detail-row">
+            <span class="detail-label">Total Workload:</span>
+            <span class="detail-value">{{ ta.totalWorkload }} hours</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Proctoring Enabled:</span>
+            <span class="detail-value">{{ ta.proctoringEnabled ? 'Yes' : 'No' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-accent" (click)="onEdit()">Edit TA</button>
+        <button class="btn btn-secondary" (click)="onBack()">Back to List</button>
+      </div>
+    </div>
+
+  </div>
+</div>

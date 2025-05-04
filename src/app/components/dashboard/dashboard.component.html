@@ -101,6 +101,18 @@
     
     <div class="card">
       <div class="card-header">
+        <h2>Workload Management</h2>
+        <span class="card-badge" *ngIf="currentUser?.role === 'instructor'">{{ stats.pendingWorkloadCount }}</span>
+      </div>
+      <p>Log and manage TA workload entries</p>
+      <div class="card-actions">
+        <a routerLink="/workload/add" class="btn btn-primary">Log Hours</a>
+        <a routerLink="/workload/instructor" class="btn btn-outline" *ngIf="currentUser?.role === 'instructor'">Review Entries</a>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
         <h2>Assignment Planning</h2>
         <span class="card-badge">{{ stats.assignmentCount }}</span>
       </div>
@@ -119,7 +131,6 @@
       <p>Generate reports on TA workload and performance</p>
       <div class="card-actions">
         <a routerLink="/performance-reports" class="btn btn-primary">View Reports</a>
-        <a routerLink="/workload/add" class="btn btn-outline">Log Hours</a>
       </div>
     </div>
 

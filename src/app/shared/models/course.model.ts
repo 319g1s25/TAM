@@ -1,15 +1,11 @@
 export class Course {
-  id!: number;
-  code!: string;
+  id?: number;
+  course_code!: string;
   name!: string;
-  description!: string;
+  description?: string;
   department!: string;
-  credits!: number;
+  credit!: number;
   semester!: string;
-  instructorId?: number;
-  instructorName?: string;
-  numberOfStudents?: number;
-  numberOfTAs?: number;
-  taRequirements?: number;
+  ta_required!: number;
 }
   

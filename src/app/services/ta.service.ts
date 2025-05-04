@@ -28,6 +28,7 @@ export class TAService {
 
   // Update a TA
   updateTA(ta: TA): Observable<TA> {
+    console.log('Sending TA to backend:', ta);
     return this.http.put<TA>(`${this.apiUrl}/${ta.id}`, ta);
   }
 

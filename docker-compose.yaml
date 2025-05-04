@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: tam-mysql
+    restart: always
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: cs319Team1.#
+      MYSQL_DATABASE: ta_management
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db_init:/docker-entrypoint-initdb.d:ro
+
+  backend:
+    build:
+      context: ./src/backend
+    container_name: tam-backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: cs319Team1.#
+      DB_NAME: ta_management
+    restart: always
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql_data:

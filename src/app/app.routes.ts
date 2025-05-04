@@ -3,8 +3,10 @@ import { LoginComponent } from './components/auth/login.component';
 import { AuthGuard } from './guards/auth.guard';
 import { TAListComponent } from './components/ta/ta-list.component';
 import { TAFormComponent } from './components/ta/ta-form.component';
+import { TADetailComponent } from './components/ta/ta-detail.component';
 import { CourseListComponent } from './components/course/course-list.component';
 import { CourseFormComponent } from './components/course/course-form.component';
+import { CourseDetailComponent } from './components/course/course-detail.component';
 import { WorkloadFormComponent } from './components/workload/workload-form.component';
 import { AssignmentListComponent } from './components/assignments/assignment-list.component';
 import { AssignmentFormComponent } from './components/assignments/assignment-form.component';
@@ -41,7 +43,7 @@ export const routes: Routes = [
   },
   { 
     path: 'tas/:id', 
-    component: TAFormComponent,
+    component: TADetailComponent,
     canActivate: [AuthGuard]
   },
   { 
@@ -61,7 +63,7 @@ export const routes: Routes = [
   },
   { 
     path: 'courses/:id', 
-    component: CourseFormComponent,
+    component: CourseDetailComponent,
     canActivate: [AuthGuard]
   },
   { 
@@ -74,18 +76,29 @@ export const routes: Routes = [
     component: WorkloadFormComponent,
     canActivate: [AuthGuard]
   },
+  {
+    path: 'workload/instructor',
+    loadComponent: () => import('./components/workload/instructor-workload.component').then(m => m.InstructorWorkloadComponent),
+    canActivate: [AuthGuard],
+    data: { roles: ['instructor'] }
+  },
   { 
     path: 'assignments', 
     component: AssignmentListComponent,
     canActivate: [AuthGuard]
   },
   { 
-    path: 'assignments/add', 
+    path: 'assignments/new', 
     component: AssignmentFormComponent,
     canActivate: [AuthGuard]
   },
   { 
     path: 'assignments/:id', 
+    component: AssignmentFormComponent,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'assignments/:id/edit', 
     component: AssignmentFormComponent,
     canActivate: [AuthGuard]
   },
@@ -96,6 +109,16 @@ export const routes: Routes = [
   },
   { 
     path: 'leave-requests/new', 
+    component: LeaveRequestFormComponent,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'leave-requests/:id', 
+    component: LeaveRequestFormComponent,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'leave-requests/:id/edit', 
     component: LeaveRequestFormComponent,
     canActivate: [AuthGuard]
   },

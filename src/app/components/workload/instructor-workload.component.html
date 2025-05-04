@@ -1,0 +1,70 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">TA Workload Entries</h3>
+        </div>
+        <div class="card-body">
+          <!-- Loading State -->
+          <div *ngIf="isLoading" class="text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+
+          <!-- Error Message -->
+          <div *ngIf="errorMessage" class="alert alert-danger">
+            {{ errorMessage }}
+          </div>
+
+          <!-- No Entries Message -->
+          <div *ngIf="!isLoading && workloadEntries.length === 0" class="alert alert-info">
+            No workload entries found for your courses.
+          </div>
+
+          <!-- Workload Entries Table -->
+          <div *ngIf="!isLoading && workloadEntries.length > 0" class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Course</th>
+                  <th>TA</th>
+                  <th>Hours</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let entry of workloadEntries">
+                  <td>{{ entry.date | date:'mediumDate' }}</td>
+                  <td>{{ entry.course_code }} - {{ entry.course_title }}</td>
+                  <td>{{ entry.ta_name }} ({{ entry.ta_email }})</td>
+                  <td>{{ entry.hoursspent }}</td>
+                  <td>{{ entry.description }}</td>
+                  <td>
+                    <span [class]="getStatusClass(entry.approved)">
+                      {{ getStatusText(entry.approved) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="btn-group" *ngIf="entry.approved === null">
+                      <button class="btn btn-sm btn-success" (click)="approveEntry(entry, true)">
+                        Approve
+                      </button>
+                      <button class="btn btn-sm btn-danger" (click)="approveEntry(entry, false)">
+                        Reject
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

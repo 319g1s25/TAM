@@ -24,9 +24,10 @@ export class AppComponent implements OnInit {
     public authService: AuthService
   ) {
     // Force navigation to login page on app startup
-    if (!this.authService.isLoggedIn) {
+    if (!this.authService.isLoggedIn && this.router.url === '/') {
       this.router.navigate(['/login']);
     }
+    
   }
 
   ngOnInit() {
@@ -35,12 +36,8 @@ export class AppComponent implements OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
       this.isLoginPage = event.url.includes('/login');
-      
-      // Always redirect to login if user tries to access the root directly
-      if ((event.url === '/' || event.url === '') && !this.authService.isLoggedIn) {
-        this.router.navigate(['/login']);
-      }
     });
+    
 
     // Check initial URL
     this.isLoginPage = this.router.url.includes('/login');

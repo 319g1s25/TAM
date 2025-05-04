@@ -65,7 +65,16 @@
   color: #2c3e50;
 }
 
-.status-badge {
+.course-code {
+  background-color: #e9ecef;
+  color: #495057;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.department-badge {
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 0.875rem;
@@ -73,12 +82,16 @@
   color: white;
 }
 
-.ms-badge {
+.department-badge.cs {
   background-color: #007bff;
 }
 
-.phd-badge {
+.department-badge.math {
   background-color: #28a745;
+}
+
+.department-badge.physics {
+  background-color: #dc3545;
 }
 
 .detail-content {
@@ -181,4 +194,4 @@
     width: 100%;
     margin-bottom: 4px;
   }
-}
+} 

@@ -36,6 +36,7 @@ export class TAFormComponent implements OnInit {
   
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
+
     if (id) {
       this.isEditing = true;
       this.loadTA(parseInt(id, 10));
@@ -43,15 +44,22 @@ export class TAFormComponent implements OnInit {
   }
   
   loadTA(id: number): void {
-    this.taService.getTA(id).subscribe(
-      ta => {
-        this.ta = ta;
+    console.log('loadTA() called with id:', id);
+
+    this.taService.getTA(id).subscribe({
+      next: ta => {
+        console.log('Received TA from backend:', ta);
+        this.ta = { ...ta, id };
+        console.log('TA after merge:', this.ta);
       },
-      error => {
-        console.error('Error loading TA:', error);
-        this.router.navigate(['/tas']);
+      error: err => {
+        console.error('Error in TA subscription:', err);
+      },
+      complete: () => {
+        console.log('TA fetch completed');
       }
-    );
+    });
+    
   }
   
   onSubmit(): void {
@@ -62,8 +70,12 @@ export class TAFormComponent implements OnInit {
       console.warn("Form is incomplete.");
       return;
     }
+    
+    this.ta.totalWorkload = this.ta.totalWorkload ?? 0; // fallback to 0
 
     if (this.isEditing) {
+      console.log('Submitting TA:', JSON.stringify(this.ta));
+
       this.taService.updateTA(this.ta).subscribe(
         updatedTa => {
           console.log('TA updated successfully:', updatedTa);

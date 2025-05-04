@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService, User } from '../../services/auth.service';
+import { AuthService } from '../../services/auth.service';
+import { User } from '../../shared/models/user.model';
 
 @Component({
   selector: 'app-leave-request-form',
@@ -67,7 +68,7 @@ import { AuthService, User } from '../../services/auth.service';
               <label for="courseIds">Affected Courses <span class="required">*</span></label>
               <select id="courseIds" formControlName="courseIds" multiple class="form-control" size="4">
                 <option *ngFor="let course of assignedCourses" [value]="course.id">
-                  {{ course.code }} - {{ course.name }}
+                  {{ course.course_code }} - {{ course.name }}
                 </option>
               </select>
               <div *ngIf="leaveForm.get('courseIds')?.invalid && leaveForm.get('courseIds')?.touched" class="error-message">
@@ -318,9 +319,9 @@ export class LeaveRequestFormComponent implements OnInit {
   minDate = '';
   
   assignedCourses = [
-    { id: 1, code: 'CS101', name: 'Introduction to Programming' },
-    { id: 2, code: 'CS201', name: 'Data Structures' },
-    { id: 3, code: 'MATH250', name: 'Linear Algebra' }
+    { id: 1, course_code: 'CS101', name: 'Introduction to Programming' },
+    { id: 2, course_code: 'CS201', name: 'Data Structures' },
+    { id: 3, course_code: 'MATH250', name: 'Linear Algebra' }
   ]; // This would be fetched from a service in a real app
   
   constructor(
