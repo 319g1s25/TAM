@@ -161,6 +161,10 @@ import { TAAssignmentService } from '../../services/ta-assignment.service';
       border-bottom: 1px solid #eee;
     }
     
+    .content-header h1 {
+      color: #333;
+    }
+    
     .stats-row {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

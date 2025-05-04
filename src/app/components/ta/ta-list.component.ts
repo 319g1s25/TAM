@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { TA } from '../../shared/models/ta.model';
 import { TAService } from '../../services/ta.service';
 
 @Component({
   selector: 'app-ta-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   template: `
     <div class="content-container">
       <header class="content-header">
@@ -30,14 +31,14 @@ import { TAService } from '../../services/ta.service';
           </div>
           
           <div class="filter-options">
-            <select class="form-control">
+            <select class="form-control" [(ngModel)]="selectedDepartment" (change)="applyFilters()">
               <option value="">All Departments</option>
               <option value="Computer Science">Computer Science</option>
               <option value="Mathematics">Mathematics</option>
               <option value="Physics">Physics</option>
             </select>
             
-            <select class="form-control">
+            <select class="form-control" [(ngModel)]="selectedStatus" (change)="applyFilters()">
               <option value="">All Status</option>
               <option value="MS">MS</option>
               <option value="PhD">PhD</option>
@@ -104,6 +105,10 @@ import { TAService } from '../../services/ta.service';
       margin-bottom: 20px;
       padding-bottom: 15px;
       border-bottom: 1px solid #eee;
+    }
+
+    .content-header h1 {
+      color: #333;
     }
     
     .search-filter-bar {
@@ -261,6 +266,9 @@ import { TAService } from '../../services/ta.service';
 export class TAListComponent implements OnInit {
   tas: TA[] = [];
   filteredTAs: TA[] = [];
+  selectedDepartment: string = '';
+  selectedStatus: string = '';
+  searchTerm: string = '';
   
   constructor(private taService: TAService) {}
 
@@ -281,13 +289,30 @@ export class TAListComponent implements OnInit {
   }
   
   onSearch(event: Event): void {
-    const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
-    this.filteredTAs = this.tas.filter(ta => 
-      ta.name.toLowerCase().includes(searchTerm) || 
-      ta.surname.toLowerCase().includes(searchTerm) || 
-      ta.email.toLowerCase().includes(searchTerm) ||
-      ta.department.toLowerCase().includes(searchTerm)
-    );
+    this.searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
+    this.applyFilters();
+  }
+  
+  applyFilters(): void {
+    this.filteredTAs = this.tas.filter(ta => {
+      // Apply search filter
+      const matchesSearch = this.searchTerm ? (
+        ta.name.toLowerCase().includes(this.searchTerm) || 
+        ta.surname.toLowerCase().includes(this.searchTerm) || 
+        ta.email.toLowerCase().includes(this.searchTerm) ||
+        ta.department.toLowerCase().includes(this.searchTerm)
+      ) : true;
+      
+      // Apply department filter
+      const matchesDepartment = this.selectedDepartment ? 
+        ta.department === this.selectedDepartment : true;
+      
+      // Apply status filter
+      const matchesStatus = this.selectedStatus ? 
+        ta.msOrPhdStatus === this.selectedStatus : true;
+      
+      return matchesSearch && matchesDepartment && matchesStatus;
+    });
   }
   
   deleteTA(id: number): void {

@@ -19,6 +19,244 @@
   margin: 0;
 }
 
+/* Upcoming Events Section */
+.upcoming-events-container {
+  margin: 30px auto;
+  width: 100%;
+  max-width: 800px;
+}
+
+.upcoming-events-card {
+  background: linear-gradient(145deg, var(--card-color) 0%, var(--card-color) 85%, rgba(44, 62, 80, 0.1) 100%);
+  border: 1px solid rgba(44, 62, 80, 0.1);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.calendar-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.upcoming-events-card .stat-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.upcoming-events-card h3 {
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+}
+.upcoming-events-card .events-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding-bottom: 8px;
+}
+
+.upcoming-events-card .events-header h3 {
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 600;
+  color: var(--primary-color, #2c3e50);
+}
+
+.upcoming-events-card .event-filters {
+  display: flex;
+  gap: 4px;
+}
+
+.upcoming-events-card .event-filters button {
+  background: transparent;
+  border: none;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--light-text-color, #555);
+  transition: all 0.2s ease;
+}
+
+.upcoming-events-card .event-filters button:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.upcoming-events-card .event-filters button.active {
+  background: var(--primary-color, #2c3e50);
+  color: white;
+}
+
+/* Mini calendar styles */
+.upcoming-events-card .mini-calendar {
+  margin-bottom: 15px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  flex: 1 1 280px;
+}
+
+.upcoming-events-card .calendar-header {
+  text-align: center;
+  font-weight: 500;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: var(--primary-color, #2c3e50);
+}
+
+.upcoming-events-card .day-names {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--light-text-color, #555);
+  margin-bottom: 4px;
+}
+
+.upcoming-events-card .days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.upcoming-events-card .day {
+  font-size: 0.85rem;
+  padding: 6px 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.upcoming-events-card .day:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.upcoming-events-card .day.today {
+  background: var(--primary-color, #2c3e50);
+  color: white;
+  font-weight: 600;
+}
+
+.upcoming-events-card .day.has-event {
+  position: relative;
+}
+
+.upcoming-events-card .day.has-event::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent-color, #e74c3c);
+}
+
+.upcoming-events-card .day.other-month {
+  color: rgba(0,0,0,0.3);
+}
+
+/* Events list */
+.upcoming-events-card .events-list {
+  flex: 2 1 400px;
+  overflow-y: auto;
+  max-height: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 8px;
+}
+.upcoming-events-card .event-card {
+  background: var(--primary-light-color, #f5f7fa);
+  border-radius: 6px;
+  padding: 12px 15px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  font-size: 0.95rem;
+  margin-bottom: 0;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid var(--primary-color, #2c3e50);
+}
+
+.upcoming-events-card .event-card:hover {
+  background: rgba(44, 62, 80, 0.05);
+  transform: translateX(2px);
+}
+
+.upcoming-events-card .event-date-indicator {
+  background: var(--primary-color, #2c3e50);
+  color: white;
+  border-radius: 4px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 2px;
+}
+
+.upcoming-events-card .event-day {
+  font-size: 14px;
+}
+
+.upcoming-events-card .event-month {
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.upcoming-events-card .event-info {
+  flex: 1;
+  overflow: hidden;
+  padding-right: 8px;
+}
+
+.upcoming-events-card .event-arrow {
+  color: var(--primary-color, #2c3e50);
+  opacity: 0.6;
+  font-size: 1.1rem;
+}
+.upcoming-events-card .event-title {
+  font-size: 1rem;
+  color: var(--primary-color, #2c3e50);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.upcoming-events-card .event-time {
+  font-size: 0.75rem;
+  color: var(--accent-color, #e74c3c);
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+
+.upcoming-events-card .event-description {
+  font-size: 0.8rem;
+  color: var(--light-text-color, #555);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.upcoming-events-card .no-events {
+  color: #888;
+  font-size: 0.95rem;
+  padding: 6px 0;
+  text-align: center;
+}
+
 /* Overview cards styling */
 .dashboard-overview {
   margin-bottom: 30px;
@@ -233,6 +471,7 @@
 
 /* Dashboard grid cards */
 .dashboard-grid {
+  margin-top: 40px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
