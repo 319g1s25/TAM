@@ -50,26 +50,66 @@
           <p class="stat-context">average per TA</p>
         </div>
       </div>
+      <!-- End of stats cards -->
     </div>
   </div>
   
-  <div class="upcoming-tasks">
-    <h2>Tasks Requiring Attention</h2>
-    <div class="task-list">
-      <div class="task-card" *ngFor="let task of urgentTasks">
-        <div class="task-priority" [ngClass]="task.priority"></div>
-        <div class="task-content">
-          <h3 class="task-title">{{ task.title }}</h3>
-          <p class="task-description">{{ task.description }}</p>
-          <div class="task-meta">
-            <span class="task-deadline">Due: {{ task.deadline | date:'mediumDate' }}</span>
-            <span class="task-category">{{ task.category }}</span>
+  <!-- Upcoming Events as calendar-style card - centered in the dashboard -->
+  <div class="upcoming-events-container">
+    <div class="upcoming-events-card">
+      <div class="events-header">
+        <h3>Upcoming Events</h3>
+        <div class="event-filters">
+          <button [class.active]="eventFilter === 'week'" (click)="filterEvents('week')">This Week</button>
+          <button [class.active]="eventFilter === 'month'" (click)="filterEvents('month')">This Month</button>
+          <button [class.active]="eventFilter === 'all'" (click)="filterEvents('all')">All</button>
+        </div>
+      </div>
+      <div class="calendar-container">
+        <div class="mini-calendar">
+          <div class="calendar-header">
+            <span>{{ currentMonth }}</span>
+          </div>
+          <div class="calendar-days">
+            <div class="day-names">
+              <span>Su</span>
+              <span>Mo</span>
+              <span>Tu</span>
+              <span>We</span>
+              <span>Th</span>
+              <span>Fr</span>
+              <span>Sa</span>
+            </div>
+            <div class="days-grid">
+              <div *ngFor="let day of calendarDays" 
+                  class="day" 
+                  [class.today]="day.isToday"
+                  [class.has-event]="day.hasEvent"
+                  [class.other-month]="day.isOtherMonth">
+                {{ day.day }}
+              </div>
+            </div>
           </div>
         </div>
-        <a [routerLink]="task.actionLink" class="task-action">{{ task.actionText }}</a>
-      </div>
-      <div class="no-tasks" *ngIf="urgentTasks.length === 0">
-        <p>No urgent tasks requiring attention</p>
+        <div class="events-list">
+          <div class="event-card" 
+              *ngFor="let event of filteredEvents"
+              (click)="openEventDetails(event)">
+            <div class="event-date-indicator">
+              <div class="event-day">{{ event.date | date:'dd' }}</div>
+              <div class="event-month">{{ event.date | date:'MMM' }}</div>
+            </div>
+            <div class="event-info">
+              <div class="event-title"><strong>{{ event.title }}</strong></div>
+              <div class="event-time">{{ event.date | date:'shortTime' }}</div>
+              <div class="event-description">{{ event.description }}</div>
+            </div>
+            <div class="event-arrow">→</div>
+          </div>
+          <div *ngIf="filteredEvents.length === 0" class="no-events">
+            <p>No upcoming events for selected period</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
