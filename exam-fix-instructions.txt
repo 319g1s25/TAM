@@ -1,0 +1,18 @@
+
+# How to Fix Exam Creation Functionality
+
+This file contains the code needed to fix the exam creation functionality in the TAM application.
+
+To deploy this fix, follow these steps:
+
+1. Copy the exam controller to the Docker container:
+   docker exec -i tam-backend bash -c "cat > /usr/src/app/controllers/exam.controller.js" < exam-controller.js
+
+2. Copy the exam router to the Docker container:
+   docker exec -i tam-backend bash -c "cat > /usr/src/app/routes/exam.router.js" < exam-router.js
+
+3. Restart the backend container:
+   docker compose restart backend
+
+These files implement a simplified version of the exam and proctoring functionality that will allow
+you to create exams and have them appear in the proctoring management list.

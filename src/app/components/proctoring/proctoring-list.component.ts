@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { TA } from '../../shared/models/ta.model';
 import { TAService } from '../../services/ta.service';
 import { ProctoringAssignmentService } from '../../services/proctoring-assignment.service';
 import { IconComponent } from '../shared/icon.component';
+import { ExamService, Exam as ApiExam } from '../../services/exam.service';
+import { NotificationService } from '../../services/notification.service';
 
 interface Exam {
   id: number;
@@ -28,7 +30,11 @@ interface Exam {
       <header class="content-header">
         <h1>Proctoring Management</h1>
         <div class="header-buttons">
-          <button class="btn btn-primary" (click)="assignProctorsAutomatically()">
+          <button class="btn btn-primary" routerLink="/proctoring/new-exam">
+            <app-icon icon="add"></app-icon>
+            Create New Exam
+          </button>
+          <button class="btn btn-secondary" (click)="assignProctorsAutomatically()">
             <app-icon icon="people"></app-icon>
             Auto-Assign Proctors
           </button>
@@ -364,47 +370,121 @@ export class ProctoringListComponent implements OnInit {
   exams: Exam[] = [];
   filteredExams: Exam[] = [];
   tas: TA[] = [];
+  forceRefresh = false;
   
   constructor(
     private taService: TAService,
-    private proctoringAssignmentService: ProctoringAssignmentService
-  ) {}
+    private proctoringAssignmentService: ProctoringAssignmentService,
+    private examService: ExamService,
+    private notificationService: NotificationService,
+    private router: Router
+  ) {
+    // Check if we're navigating from the exam form with refresh state
+    const navigation = this.router.getCurrentNavigation();
+    const state = navigation?.extras.state as { refresh: boolean } | undefined;
+    
+    if (state && state.refresh) {
+      // We'll force a refresh immediately when component initializes
+      this.forceRefresh = true;
+    }
+  }
 
   ngOnInit(): void {
-    this.loadExams();
-    this.loadTAs();
+    // If we need to force refresh (coming from exam creation), use timeout to ensure DOM is ready
+    if (this.forceRefresh) {
+      setTimeout(() => {
+        this.loadExams();
+        this.loadTAs();
+      }, 100);
+    } else {
+      this.loadExams();
+      this.loadTAs();
+    }
   }
   
   loadExams(): void {
-    // TODO: Implement exam loading from your backend service
-    // For now, using mock data
-    this.exams = [
-      {
-        id: 1,
-        courseId: 1,
-        courseCode: 'CS101',
-        courseName: 'Introduction to Computer Science',
-        date: '2024-03-15',
-        startTime: '09:00',
-        endTime: '11:00',
-        requiredProctors: 2,
-        assignedProctors: 1,
-        department: 'Computer Science'
+    this.examService.getAllExams().subscribe(
+      response => {
+        if (response.success && response.exams && response.exams.length > 0) {
+          // Transform API exam data to our component format
+          this.exams = response.exams.map(apiExam => {
+            // Extract date and time from the full datetime
+            const examDate = new Date(apiExam.date);
+            const date = examDate.toISOString().split('T')[0];
+            const startTime = examDate.toTimeString().substring(0, 5);
+            const endTime = new Date(examDate.getTime() + apiExam.duration * 60 * 60 * 1000)
+              .toTimeString().substring(0, 5);
+              
+            // Get department from course info
+            const department = 'Computer Science'; // Default for now
+            
+            return {
+              id: apiExam.id,
+              courseId: apiExam.courseID,
+              courseCode: apiExam.course_code || 'N/A',
+              courseName: apiExam.course_name || 'Unknown Course',
+              date: date,
+              startTime: startTime,
+              endTime: endTime,
+              requiredProctors: apiExam.proctorsRequired,
+              assignedProctors: 0, // We'll get this from proctoring assignments
+              department: department
+            };
+          });
+          
+          // Load proctoring assignments to get assigned proctors count
+          this.loadProctoringAssignmentsForExams();
+          
+          this.filteredExams = this.exams;
+        } else {
+          // Try to load exams from localStorage if API fails or returns empty array
+          this.loadExamsFromLocalStorage();
+        }
       },
-      {
-        id: 2,
-        courseId: 2,
-        courseCode: 'MATH201',
-        courseName: 'Calculus II',
-        date: '2024-03-16',
-        startTime: '10:00',
-        endTime: '12:00',
-        requiredProctors: 2,
-        assignedProctors: 0,
-        department: 'Mathematics'
+      error => {
+        console.error('Error loading exams:', error);
+        // Try to load exams from localStorage if API fails
+        this.loadExamsFromLocalStorage();
       }
-    ];
-    this.filteredExams = this.exams;
+    );
+  }
+  
+  // Fallback method to load exams from localStorage for demonstration purposes
+  loadExamsFromLocalStorage(): void {
+    try {
+      const mockExams = JSON.parse(localStorage.getItem('mockExams') || '[]');
+      if (mockExams.length > 0) {
+        this.exams = mockExams.map((apiExam: any) => {
+          // Extract date and time from the full datetime
+          const examDate = new Date(apiExam.date);
+          const date = examDate.toISOString().split('T')[0];
+          const startTime = examDate.toTimeString().substring(0, 5);
+          const endTime = new Date(examDate.getTime() + apiExam.duration * 60 * 60 * 1000)
+            .toTimeString().substring(0, 5);
+            
+          // Get department from course info
+          const department = 'Computer Science'; // Default for now
+          
+          return {
+            id: apiExam.id,
+            courseId: apiExam.courseID,
+            courseCode: apiExam.course_code || 'N/A',
+            courseName: apiExam.course_name || 'Unknown Course',
+            date: date,
+            startTime: startTime,
+            endTime: endTime,
+            requiredProctors: apiExam.proctorsRequired,
+            assignedProctors: 0,
+            department: department
+          };
+        });
+        
+        this.filteredExams = this.exams;
+        this.notificationService.showInfo('Loaded exams from local storage');
+      }
+    } catch (error) {
+      console.error('Error loading exams from localStorage:', error);
+    }
   }
   
   loadTAs(): void {
@@ -493,7 +573,35 @@ export class ProctoringListComponent implements OnInit {
     }, 0);
   }
 
+  loadProctoringAssignmentsForExams(): void {
+    this.exams.forEach(exam => {
+      this.examService.getExamById(exam.id).subscribe(
+        response => {
+          if (response.success && response.proctoringAssignments) {
+            // Update the assigned proctors count for this exam
+            const examIndex = this.exams.findIndex(e => e.id === exam.id);
+            if (examIndex !== -1) {
+              this.exams[examIndex].assignedProctors = response.proctoringAssignments.length;
+              // Update filtered exams as well if needed
+              const filteredIndex = this.filteredExams.findIndex(e => e.id === exam.id);
+              if (filteredIndex !== -1) {
+                this.filteredExams[filteredIndex].assignedProctors = response.proctoringAssignments.length;
+              }
+            }
+          }
+        },
+        error => {
+          console.error(`Error loading assignments for exam ${exam.id}:`, error);
+          console.error(`Error loading proctoring assignments for exam ${exam.id}:`, error);
+        }
+      );
+    });
+  }
+
   assignProctorsAutomatically(): void {
+    // Show loading notification
+    this.notificationService.showInfo('Automatically assigning proctors...');
+    
     // Get exams that need proctors
     const examsNeedingProctors = this.exams.filter(exam => 
       exam.requiredProctors > exam.assignedProctors
@@ -512,61 +620,32 @@ export class ProctoringListComponent implements OnInit {
       return;
     }
 
-    // Generate assignments
-    const assignments = this.proctoringAssignmentService.assignProctorsAutomatically(examsNeedingProctors, availableTAs);
-    const summary = this.proctoringAssignmentService.generateAssignmentSummary(assignments, examsNeedingProctors, availableTAs);
-
-    // Show assignment summary and ask for confirmation
-    let summaryText = 'Proposed Proctoring Assignments:\n\n';
-    
-    // Show assigned exams
-    if (summary.examAssignments.length > 0) {
-      summaryText += 'Assigned Exams:\n';
-      summary.examAssignments.forEach(exam => {
-        summaryText += `${exam.courseName} (${exam.courseCode}):\n`;
-        summaryText += `  Date: ${exam.date}\n`;
-        summaryText += `  Time: ${exam.time}\n`;
-        summaryText += `  Required Proctors: ${exam.requiredProctors}\n`;
-        summaryText += `  Assigned Proctors: ${exam.assignedProctors}\n`;
-        if (exam.assignedTANames.length > 0) {
-          summaryText += '  Assigned Proctors:\n';
-          exam.assignedTANames.forEach(taName => {
-            summaryText += `    - ${taName}\n`;
-          });
+    // Call each exam's auto-assign endpoint
+    let completedCount = 0;
+    examsNeedingProctors.forEach(exam => {
+      this.examService.autoAssignProctors(exam.id).subscribe(
+        response => {
+          completedCount++;
+          if (completedCount === examsNeedingProctors.length) {
+            // All assignments complete
+            this.notificationService.showSuccess('Automatic proctor assignment complete');
+            this.loadExams(); // Reload the exams to show updated assignments
+          }
+        },
+        error => {
+          console.error(`Error auto-assigning proctors to exam ${exam.id}:`, error);
+          this.notificationService.showError(`Failed to assign proctors to exam ${exam.courseCode}`);
+          completedCount++;
+          if (completedCount === examsNeedingProctors.length) {
+            this.loadExams(); // Still reload to get any successful assignments
+          }
         }
-        summaryText += '\n';
-      });
-    }
-
-    // Show unassigned exams
-    if (summary.unassignedExams.length > 0) {
-      summaryText += 'Unassigned Exams:\n';
-      summary.unassignedExams.forEach(exam => {
-        summaryText += `  ${exam.courseName} (${exam.courseCode})\n`;
-        summaryText += `  Date: ${exam.date}\n`;
-        summaryText += `  Time: ${exam.time}\n`;
-        summaryText += `  Needs ${exam.requiredProctors} proctors\n\n`;
-      });
-    }
-
-    // Show TA workloads
-    summaryText += 'TA Workloads:\n';
-    summary.taWorkloads.forEach(ta => {
-      summaryText += `  ${ta.taName}: ${ta.assignedExams} exams (${ta.totalWorkload} hours)\n`;
+      );
     });
-
-    if (confirm(`${summaryText}\nDo you want to proceed with these assignments?`)) {
-      // Update exam proctor assignments
-      assignments.forEach((taIds, examId) => {
-        const exam = examsNeedingProctors.find(e => e.id === examId);
-        if (exam) {
-          exam.assignedProctors += taIds.length;
-          // TODO: Update exam in backend
-        }
-      });
-
-      alert('Proctoring assignments have been updated successfully.');
-      this.loadExams(); // Refresh the exam list
-    }
   }
-} 
+
+  // Refresh the exam list
+  refreshExamList(): void {
+    this.loadExams();
+  }
+}

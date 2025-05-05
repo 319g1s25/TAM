@@ -1,22 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-<<<<<<< HEAD
-import { TA  } from '../../shared/models/ta.model';
-=======
 import { FormsModule } from '@angular/forms';
 import { TA } from '../../shared/models/ta.model';
->>>>>>> d1486f6081bd45e158529aca6408e4c1a81ae960
 import { TAService } from '../../services/ta.service';
 
 @Component({
   selector: 'app-ta-list',
   standalone: true,
-<<<<<<< HEAD
-  imports: [CommonModule, RouterLink],
-  templateUrl: './ta-list.component.html' ,
-  styleUrls: ['./ta-list.component.css']
-=======
   imports: [CommonModule, RouterLink, FormsModule],
   template: `
     <div class="content-container">
@@ -271,18 +262,13 @@ import { TAService } from '../../services/ta.service';
       }
     }
   `]
->>>>>>> d1486f6081bd45e158529aca6408e4c1a81ae960
 })
 export class TAListComponent implements OnInit {
   tas: TA[] = [];
   filteredTAs: TA[] = [];
-<<<<<<< HEAD
-
-=======
   selectedDepartment: string = '';
   selectedStatus: string = '';
   searchTerm: string = '';
->>>>>>> d1486f6081bd45e158529aca6408e4c1a81ae960
   
   constructor(private taService: TAService) {}
 
@@ -329,7 +315,9 @@ export class TAListComponent implements OnInit {
     });
   }
   
-  deleteTA(id: number): void {
+  deleteTA(id: number | undefined): void {
+    if (!id) return;
+    
     if (confirm('Are you sure you want to delete this TA?')) {
       this.taService.deleteTA(id).subscribe(
         () => {

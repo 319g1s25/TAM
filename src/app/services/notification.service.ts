@@ -47,6 +47,22 @@ export class NotificationService {
     return newNotification;
   }
 
+  showSuccess(message: string) {
+    return this.addNotification(message, 'success');
+  }
+  
+  showError(message: string) {
+    return this.addNotification(message, 'error');
+  }
+  
+  showInfo(message: string) {
+    return this.addNotification(message, 'info');
+  }
+  
+  showWarning(message: string) {
+    return this.addNotification(message, 'warning');
+  }
+
   markAsRead(id: number) {
     const notifications = this.notificationsSubject.value;
     const updatedNotifications = notifications.map(n => 

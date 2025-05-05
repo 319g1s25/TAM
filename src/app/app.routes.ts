@@ -13,6 +13,7 @@ import { AssignmentFormComponent } from './components/assignments/assignment-for
 import { LeaveRequestListComponent } from './components/leave-request/leave-request-list.component';
 import { LeaveRequestFormComponent } from './components/leave-request/leave-request-form.component';
 import { ProctoringListComponent } from './components/proctoring/proctoring-list.component';
+import { ExamFormComponent } from './components/proctoring/exam-form.component';
 
 export const routes: Routes = [
   // Login route (publicly accessible) - listed first for priority
@@ -100,7 +101,18 @@ export const routes: Routes = [
   },
   { 
     path: 'proctoring', 
-    component: ProctoringListComponent
+    component: ProctoringListComponent,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'proctoring/new-exam', 
+    component: ExamFormComponent,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'proctoring/:id/edit', 
+    component: ExamFormComponent,
+    canActivate: [AuthGuard]
   },
   {  
     path: 'assignments/:id/edit', 

@@ -56,36 +56,5 @@ export class LoginComponent implements OnInit {
       });
   }
   
-  loginAsDemo(role: string): void {
-    this.isLoading = true;
-    this.errorMessage = null;
-    
-    let credentials;
-    switch (role) {
-      case 'admin':
-        credentials = { email: 'admin@example.com', password: 'admin123' };
-        break;
-      case 'coordinator':
-        credentials = { email: 'coordinator@example.com', password: 'coord123' };
-        break;
-      case 'ta':
-        credentials = { email: 'ta@example.com', password: 'ta123456' };
-        break;
-      default:
-        this.isLoading = false;
-        this.errorMessage = 'Invalid demo role selected';
-        return;
-    }
-    
-    this.authService.login(credentials.email, credentials.password)
-      .subscribe({
-        next: () => {
-          this.router.navigate(['/dashboard']);
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.errorMessage = error.message || 'Failed to login with demo account.';
-        }
-      });
-  }
-} 
+  // Demo login functionality removed
+}

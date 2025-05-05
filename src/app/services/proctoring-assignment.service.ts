@@ -67,7 +67,7 @@ export class ProctoringAssignmentService {
       const currentAssignments = assignments.get(exam.id) || [];
       const availableTAs = sortedTAs.filter(ta => {
         // Check if TA is already assigned to this exam
-        if (currentAssignments.includes(ta.id)) return false;
+        if (ta.id !== undefined && currentAssignments.includes(ta.id)) return false;
         
         // Check if TA is on leave
         if (ta.isOnLeave) return false;
@@ -82,7 +82,7 @@ export class ProctoringAssignmentService {
         if (!ta.proctoringEnabled) return false;
         
         // Check for time conflicts
-        const taSchedule = taSchedules.get(ta.id) || [];
+        const taSchedule = ta.id !== undefined ? taSchedules.get(ta.id) || [] : [];
         const hasConflict = taSchedule.some(slot => {
           return (examStart >= slot.start && examStart < slot.end) ||
                  (examEnd > slot.start && examEnd <= slot.end) ||
@@ -105,13 +105,13 @@ export class ProctoringAssignmentService {
       // Assign proctors to the exam (do as many as possible)
       for (let i = 0; i < requiredProctors && i < suitableTAs.length; i++) {
         const ta = suitableTAs[i];
-        currentAssignments.push(ta.id);
+        if (ta.id !== undefined) currentAssignments.push(ta.id);
         
         // Update TA's schedule
-        if (!taSchedules.has(ta.id)) {
+        if (ta.id !== undefined && !taSchedules.has(ta.id)) {
           taSchedules.set(ta.id, []);
         }
-        taSchedules.get(ta.id)!.push({ start: examStart, end: examEnd });
+        if (ta.id !== undefined) taSchedules.get(ta.id)!.push({ start: examStart, end: examEnd });
         
         // Update TA's workload (assuming 4 hours per proctoring session)
         ta.totalWorkload += 4;
@@ -185,7 +185,7 @@ export class ProctoringAssignmentService {
 
     // Initialize TA workloads
     tas.forEach(ta => {
-      taWorkloads.set(ta.id, {
+      if (ta.id !== undefined) taWorkloads.set(ta.id, {
         taId: ta.id,
         taName: `${ta.name} ${ta.surname}`,
         totalWorkload: ta.totalWorkload,

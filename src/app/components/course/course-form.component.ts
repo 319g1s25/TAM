@@ -17,10 +17,15 @@ export class CourseFormComponent implements OnInit {
     name: '',
     department: '',
     course_code: '',
+    code: '',
     description: '',
     semester: '',
     credit: 0,
-    ta_required: 0
+    credits: 0,
+    ta_required: 0,
+    taRequirements: 0,
+    numberOfStudents: 0,
+    numberOfTAs: 0
   };
 
   isEditing = false;

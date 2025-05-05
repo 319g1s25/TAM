@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Course } from '../shared/models/course.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CourseService {
-  private apiUrl = 'http://localhost:3000/api/courses'; // Backend API endpoint
+  private apiUrl = `${environment.apiUrl}/courses`; // Backend API endpoint
 
   constructor(private http: HttpClient) {}
 

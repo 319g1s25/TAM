@@ -36,7 +36,7 @@ export class TAAssignmentService {
 
     // Initialize assignments map
     courses.forEach(course => {
-      assignments.set(course.id, []);
+      if (course.id !== undefined) assignments.set(course.id, []);
     });
 
     // Assign TAs to each course
@@ -44,10 +44,10 @@ export class TAAssignmentService {
       const requiredTAs = (course.taRequirements || 0) - (course.numberOfTAs || 0);
       if (requiredTAs <= 0) return;
 
-      const currentAssignments = assignments.get(course.id) || [];
+      const currentAssignments = course.id !== undefined ? assignments.get(course.id) || [] : [];
       const availableTAs = sortedTAs.filter(ta => {
         // Check if TA is already assigned to this course
-        if (currentAssignments.includes(ta.id)) return false;
+        if (ta.id !== undefined && currentAssignments.includes(ta.id)) return false;
         
         // Check if TA is on leave
         if (ta.isOnLeave) return false;
@@ -72,12 +72,12 @@ export class TAAssignmentService {
       // Assign TAs to the course (do as many as possible)
       for (let i = 0; i < requiredTAs && i < suitableTAs.length; i++) {
         const ta = suitableTAs[i];
-        currentAssignments.push(ta.id);
+        if (ta.id !== undefined) currentAssignments.push(ta.id);
         // Update TA's workload (assuming 20 hours per course)
         ta.totalWorkload += 20;
       }
 
-      assignments.set(course.id, currentAssignments);
+      if (course.id !== undefined) assignments.set(course.id, currentAssignments);
     });
 
     return assignments;
@@ -137,7 +137,7 @@ export class TAAssignmentService {
 
     // Initialize TA workloads
     tas.forEach(ta => {
-      taWorkloads.set(ta.id, {
+      if (ta.id !== undefined) taWorkloads.set(ta.id, {
         taId: ta.id,
         taName: `${ta.name} ${ta.surname}`,
         totalWorkload: ta.totalWorkload,
@@ -164,7 +164,7 @@ export class TAAssignmentService {
 
       if (assignedTANames.length > 0) {
         courseAssignments.push({
-          courseId: course.id,
+          courseId: course.id !== undefined ? course.id : 0,
           courseName: course.name,
           courseCode: course.code,
           requiredTAs,
@@ -173,7 +173,7 @@ export class TAAssignmentService {
         });
       } else if (requiredTAs > 0) {
         unassignedCourses.push({
-          courseId: course.id,
+          courseId: course.id !== undefined ? course.id : 0,
           courseName: course.name,
           courseCode: course.code,
           requiredTAs
@@ -213,7 +213,7 @@ export class TAAssignmentService {
 
     // Check if all courses have their required TAs
     for (const course of courses) {
-      const assignedTAs = assignments.get(course.id) || [];
+      const assignedTAs = course.id !== undefined ? assignments.get(course.id) || [] : [];
       const requiredTAs = course.taRequirements || 0;
       if (assignedTAs.length < requiredTAs) {
         return false; // Course doesn't have enough TAs

@@ -1,29 +1,77 @@
-# AngularTourOfHeroes
+# Teaching Assistant Management (TAM)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.7.
+A comprehensive web application for managing teaching assistants and courses in academic institutions.
 
-## Development server
+## Project Overview
 
-To start a local development server, run:
+TAM is a full-stack application built with:
+- Frontend: Angular 19.2.0
+- Backend: Node.js with MySQL
+- Database: MySQL
+- Containerization: Docker
+
+## Features
+
+- Course management
+- TA assignment and workload tracking
+- Performance reporting
+- Leave request management
+- Role-based access control
+- Dashboard with statistics and analytics
+
+## User Roles
+
+- Instructors
+- Teaching Assistants (TAs)
+- Auth Staff
+- Dean's Office
+- Department Chairs
+
+## Prerequisites
+
+- Node.js (v18 or higher)
+- Docker and Docker Compose
+- Angular CLI (v19.2.7)
+
+## Getting Started
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development environment:
+   ```bash
+   docker-compose up
+   ```
+
+4. Access the application at `http://localhost:4200`
+
+## Development
+
+### Development Server
+
+To start the Angular development server without Docker:
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Building
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+To build the project:
 
 ```bash
-ng generate component component-name
+ng build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Running Tests
+
+Run unit tests:
 
 ```bash
-ng generate --help
+ng test
 ```
 
 ## Building

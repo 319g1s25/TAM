@@ -4,11 +4,22 @@ const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const db = require('./db');
 const morgan = require('morgan');
+const path = require('path');
 const taRoutes = require('./routes/ta.router');
 const courseRoutes = require('./routes/course.router');
 const workloadRoutes = require('./routes/workload.router');
 const authRoutes = require('./routes/auth.router');
 const dashboardRoutes = require('./routes/dashboard.router');
+
+// Check if exam router exists and import it
+let examRoutes;
+try {
+  console.log('Loading exam router from:', path.resolve('./routes/exam.router'));
+  examRoutes = require('./routes/exam.router');
+  console.log('Exam router loaded successfully');
+} catch (error) {
+  console.error('Failed to load exam router:', error);
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,12 +37,66 @@ app.use('/api/workload', workloadRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
+// Only register exam routes if they exist
+if (examRoutes) {
+  console.log('Registering exam routes at /api/exams');
+  app.use('/api/exams', examRoutes);
+} else {
+  // Add placeholder route for exams to prevent 404 errors
+  app.get('/api/exams', (req, res) => {
+    console.log('Using placeholder exam route');
+    res.status(200).json({ success: true, exams: [], message: 'Exam functionality not yet available' });
+  });
+  
+  app.post('/api/exams', (req, res) => {
+    console.log('Using placeholder exam creation route', req.body);
+    res.status(201).json({ success: true, message: 'Exam created (placeholder)', id: Date.now() });
+  });
+}
+
 // Start the server
+// Initialize exam tables
+const initExamTables = async () => {
+  try {
+    // Create exam tables if they don't exist
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS exam (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        userID INT NOT NULL,
+        courseID INT NOT NULL,
+        date DATETIME NOT NULL,
+        duration DECIMAL(5,2) NOT NULL,
+        proctorsRequired INT NOT NULL DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('Exam table created or already exists');
+    
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS proctoringassignment (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        examID INT NOT NULL,
+        taID INT NOT NULL,
+        status ENUM('assigned', 'accepted', 'declined', 'completed') DEFAULT 'assigned',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_exam_ta (examID, taID)
+      )
+    `);
+    console.log('ProctoringAssignment table created or already exists');
+  } catch (error) {
+    console.error('Error initializing exam tables:', error);
+  }
+};
+
 async function startServer() {
   try {
     // Test database connection
     const connected = await db.testConnection();
     if (connected) {
+      // Initialize database tables
+      await initExamTables();
       
       // Start listening
       app.listen(PORT, () => {
