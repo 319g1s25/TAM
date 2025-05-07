@@ -45,7 +45,9 @@ exports.createExam = async (req, res) => {
        VALUES (?, ?, ?, ?, ?)`,
       [courseId, userId, date, duration, proctorsRequired]
     );
-    const examId = result.insertId;
+    console.log('Insert result:', result);
+    const examId = result.insertId ?? result[0]?.insertId;
+    if (!examId) throw new Error('insertId missing in result');
 
     // Insert into exam_classroom junction table
     for (const classroomId of classrooms) {
@@ -100,9 +102,16 @@ exports.deleteExam = async (req, res) => {
 exports.getClassroomsForExam = async (req, res) => {
   const { examId } = req.params;
 
+  if (!examId) {
+    return res.status(400).json({ error: 'Missing exam ID' });
+  }
+  
+  console.log("Received examId:", examId);
+
+
   try {
     const classrooms = await db.query(
-      `SELECT c.id, c.name 
+      `SELECT c.id, c.room AS name
        FROM classroom c
        JOIN exam_classroom ec ON ec.classroomID = c.id
        WHERE ec.examID = ?`,

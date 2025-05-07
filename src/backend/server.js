@@ -11,6 +11,9 @@ const authRoutes = require('./routes/auth.router');
 const dashboardRoutes = require('./routes/dashboard.router');
 const taAssignmentRoutes = require('./routes/ta-assignment.router');
 const examRoutes = require('./routes/exam.router');
+const classroomRoutes = require('./routes/classroom.router');
+const proctoringRoutes = require('./routes/proctoring-assignment.router');
+
 console.log('Exam routes:', examRoutes);
 
 const app = express();
@@ -30,6 +33,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/ta-assignments', taAssignmentRoutes);
 app.use('/api/exams', examRoutes);
+app.use('/api/classrooms', classroomRoutes);
+app.use('/api/proctoring-assignments', proctoringRoutes);
 
 // Start the server
 async function startServer() {

@@ -64,6 +64,7 @@ CREATE TABLE `classroom` (
 
 LOCK TABLES `classroom` WRITE;
 /*!40000 ALTER TABLE `classroom` DISABLE KEYS */;
+INSERT INTO `classroom` VALUES (1, 'BZ102', 64, 32), (2, 'BZ103', 64, 32);
 /*!40000 ALTER TABLE `classroom` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -463,7 +464,15 @@ CREATE TABLE `ta` (
 
 LOCK TABLES `ta` WRITE;
 /*!40000 ALTER TABLE `ta` DISABLE KEYS */;
-INSERT INTO `ta` VALUES (4,'Nazlı','Çevik','nazli@bilkent.edu.tr','nazli1234',0,25,'PhD',1,'Computer Science');
+INSERT INTO `ta` VALUES
+(1, 'Ahmet', 'Yılmaz', 'ahmet@bilkent.edu.tr', 'ahmet1234', 1, 20, 'MSc', 1, 'Computer Science'),
+(2, 'Elif', 'Kara', 'elif@bilkent.edu.tr', 'elif1234', 0, 15, 'PhD', 1, 'Endustrial Engineering'),
+(3, 'Mehmet', 'Öztürk', 'mehmet@bilkent.edu.tr', 'mehmet1234', 1, 25, 'PhD', 0, 'Computer Science'),
+(4, 'Nazlı', 'Çevik', 'nazli@bilkent.edu.tr', 'nazli1234', 0, 25, 'PhD', 1, 'Computer Science'),
+(5, 'Zeynep', 'Demir', 'zeynep@bilkent.edu.tr', 'zeynep1234', 0, 18, 'MSc', 0, 'Computer Science'),
+(6, 'Burak', 'Aslan', 'burak@bilkent.edu.tr', 'burak1234', 1, 20, 'MSc', 1, 'Industrial Engineering'),
+(7, 'Ece', 'Aydın', 'ece@bilkent.edu.tr', 'ece1234', 0, 22, 'PhD', 1, 'Industrial Engineering'),
+(8, 'Mert', 'Çelik', 'mert@bilkent.edu.tr', 'mert1234', 1, 30, 'MSc', 0, 'Computer Science');
 /*!40000 ALTER TABLE `ta` ENABLE KEYS */;
 UNLOCK TABLES;
 

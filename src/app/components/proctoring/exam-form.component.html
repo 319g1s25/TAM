@@ -6,7 +6,7 @@
       <select id="courseId" formControlName="courseId" class="form-control">
         <option value="">Select a course</option>
         <option *ngFor="let course of courses" [value]="course.id">
-          {{ course.code }} - {{ course.name }}
+          {{ course.course_code }} - {{ course.name }}
         </option>
       </select>
     </div>
@@ -17,7 +17,7 @@
     </div>
 
     <div class="form-group">
-      <label for="duration">Duration (hours)</label>
+      <label for="duration">Duration (minutes)</label>
       <input type="number" id="duration" formControlName="duration" class="form-control" min="1">
     </div>
 
@@ -37,7 +37,7 @@
             (change)="toggleClassroomSelection(classroom.id)"
           >
           <label [for]="'classroom-' + classroom.id">
-            {{ classroom.name }} (Capacity: {{ classroom.capacity }})
+            {{ classroom.room }} (Capacity: {{ classroom.capacity }})
           </label>
         </div>
       </div>

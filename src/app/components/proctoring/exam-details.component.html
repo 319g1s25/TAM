@@ -1,0 +1,78 @@
+<div class="exam-details-container">
+  <div class="header">
+    <button class="back-button" (click)="goBack()">
+      <span>← Back to Exams</span>
+    </button>
+    <h1>Exam Details</h1>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <div *ngIf="!loading && exam && course" class="content">
+    <div class="exam-info-card">
+      <div class="card-header">
+        <h2>{{ course.course_code }} - {{ course.name }}</h2>
+        <span class="exam-id">Exam #{{ exam.id }}</span>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <h3>Date</h3>
+          <p>{{ exam.date | date:'mediumDate' }}</p>
+        </div>
+        <div class="info-item">
+          <h3>Duration</h3>
+          <p>{{ exam.duration }} minutes</p>
+        </div>
+        <div class="info-item">
+          <h3>Proctors Required</h3>
+          <p>{{ exam.proctorsRequired }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="classrooms-card">
+      <div class="card-header">
+        <h2>Assigned Classrooms</h2>
+      </div>
+
+      <div *ngIf="classrooms.length === 0" class="no-classrooms">
+        <p>No classrooms have been assigned to this exam yet.</p>
+      </div>
+
+      <div *ngIf="classrooms.length > 0" class="classrooms-list">
+        <div *ngFor="let classroom of classrooms" class="classroom-item">
+          <div class="classroom-info">
+            <h3>Room {{ classroom.name }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="assigned-tas-card">
+      <div class="card-header">
+        <h2>Assigned Proctors</h2>
+        <button class="assign-button" (click)="goToAssignProctors()">
+          Manage Proctors
+        </button>
+      </div>
+
+      <div *ngIf="assignedTAs.length === 0" class="no-tas">
+        <p>No proctors have been assigned to this exam yet.</p>
+      </div>
+
+      <div *ngIf="assignedTAs.length > 0" class="tas-list">
+        <div *ngFor="let ta of assignedTAs" class="ta-item">
+          <div class="ta-info">
+            <h3>{{ ta.name }}</h3>
+            <p class="department">{{ ta.department }}</p>
+            <p class="workload">Current Workload: {{ ta.totalWorkload }} hours</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

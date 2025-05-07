@@ -1,10 +1,10 @@
 <div class="proctoring-container">
   <div class="header">
     <h1>Manage Exams</h1>
-    <button class="btn btn-primary" (click)="createNewExam()">
+    <button class="btn btn-primary" routerLink="/proctoring/new">
       <app-icon name="plus"></app-icon>
-      Create New Exam
-    </button>
+      Create Exam
+    </button>    
   </div>
 
   <div class="stats-container">
@@ -74,6 +74,11 @@
       </div>
 
       <div class="exam-actions">
+        <a
+          class="btn btn-secondary"
+          [routerLink]="['/proctoring', exam.id]">
+          View Details
+        </a>
         <button
           class="btn btn-primary"
           (click)="assignProctors(exam.id)">

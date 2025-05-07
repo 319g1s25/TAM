@@ -4,13 +4,13 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { Router } from '@angular/router';
 import { ExamService } from '../../services/exam.service';
 import { CourseService } from '../../services/course.service';
+import { AuthService } from '../../services/auth.service';
 import { ClassroomService } from '../../services/classroom.service';
 import { Course } from '../../shared/models/course.model';
 import { Classroom } from '../../shared/models/classroom.model';
 
 @Component({
   selector: 'app-exam-form',
-  standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './exam-form.component.html',
   styleUrls: ['./exam-form.component.css']
@@ -20,20 +20,23 @@ export class ExamFormComponent implements OnInit {
   courses: Course[] = [];
   classrooms: Classroom[] = [];
   selectedClassrooms: number[] = [];
+  currentUserId: string = '';
 
   constructor(
     private fb: FormBuilder,
     private examService: ExamService,
     private courseService: CourseService,
     private classroomService: ClassroomService,
-    private router: Router
+    private authService: AuthService,
+    public router: Router
   ) {
     this.examForm = this.fb.group({
       courseId: ['', Validators.required],
       date: ['', Validators.required],
       duration: ['', [Validators.required, Validators.min(1)]],
       proctorsRequired: ['', [Validators.required, Validators.min(1)]],
-      classrooms: [[], Validators.required]
+      classrooms: [[], Validators.required],
+      userId: ['', Validators.required] 
     });
   }
 
@@ -41,6 +44,16 @@ export class ExamFormComponent implements OnInit {
     console.log("ngoninit for exam form triggered");
     this.loadCourses();
     this.loadClassrooms();
+
+    // get the current id of the user
+    const currentUser = this.authService.currentUserValue;
+    if (currentUser && (currentUser.role === 'instructor' || currentUser.role === 'deansoffice' 
+      || currentUser.role === 'departmentchair' || currentUser.role === 'authstaff')) {
+    this.currentUserId = currentUser.id;
+    this.examForm.patchValue({
+      userId: currentUser.id
+    });
+  }
   }
 
   loadCourses(): void {
@@ -79,12 +92,15 @@ export class ExamFormComponent implements OnInit {
     if (this.examForm.valid) {
       const examData = {
         ...this.examForm.value,
-        userId: 1, // TODO: Get from auth service
         classrooms: this.selectedClassrooms
       };
 
+      console.log('Submitting exam:', examData);
+
       this.examService.createExam(examData).subscribe(
         response => {
+          console.log('✅ Exam created:', response);
+
           // Navigate to proctor assignment page
           this.router.navigate(['/proctoring/assign', response.id]);
         },

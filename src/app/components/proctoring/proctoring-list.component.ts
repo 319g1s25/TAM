@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterModule } from '@angular/router';
 import { TAService } from '../../services/ta.service';
 import { ExamService } from '../../services/exam.service';
 import { CourseService } from '../../services/course.service';
@@ -13,7 +13,7 @@ import { TA } from '../../shared/models/ta.model';
 @Component({
   selector: 'app-proctoring-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, IconComponent],
+  imports: [CommonModule, RouterLink, RouterModule, IconComponent],
   templateUrl: './proctoring-list.component.html',
   styleUrl: './proctoring-list.component.css'
 })
@@ -22,139 +22,161 @@ export class ProctoringListComponent implements OnInit {
   filteredExams: Exam[] = [];
   courses: Course[] = [];
   tas: TA[] = [];
-
-  assignedCounts: { [examId: number]: number } = {};
-  classroomCounts: { [examId: number]: number } = {};
+  assignedCounts: { [key: number]: number } = {};
+  classroomCounts: { [key: number]: number } = {};
 
   searchTerm = '';
   departmentFilter = '';
   dateFilter = '';
 
   constructor(
-    private taService: TAService,
     private examService: ExamService,
     private courseService: CourseService,
+    private taService: TAService,
     private proctoringAssignmentService: ProctoringAssignmentService,
     private router: Router
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
+    console.log('ProctoringListComponent initialized');
     this.loadCourses();
     this.loadTAs();
+    this.loadExams();
   }
 
-  loadCourses(): void {
-    this.courseService.getAllCourses().subscribe(
-      courses => {
-        this.courses = courses;
-        this.loadExams();
-      },
-      err => console.error('Error loading courses:', err)
-    );
-  }
-
-  loadExams(): void {
-    this.examService.getAllExams().subscribe(
-      exams => {
+  private loadExams() {
+    console.log('Loading exams...');
+    this.examService.getAllExams().subscribe({
+      next: (exams: Exam[]) => {
+        console.log('Exams loaded:', exams);
         this.exams = exams;
-        this.filteredExams = [...exams];
-
-        exams.forEach(exam => {
-          this.proctoringAssignmentService.getAssignedProctorCount(exam.id).subscribe(
-            count => this.assignedCounts[exam.id] = count,
-            err => console.error(`Error fetching count for exam ${exam.id}:`, err)
-          );
-
-          this.examService.getClassroomsForExam(exam.id).subscribe(
-            classrooms => this.classroomCounts[exam.id] = classrooms.length,
-            err => console.error(`Error fetching classrooms for exam ${exam.id}:`, err)
-          );
-        });
+        this.filteredExams = exams;
+        this.updateAssignmentCounts();
+        this.updateClassroomCounts();
       },
-      err => console.error('Error loading exams:', err)
-    );
+      error: (error: any) => {
+        console.error('Error loading exams:', error);
+      }
+    });
   }
 
-  loadTAs(): void {
-    this.taService.getAllTAs().subscribe(
-      tas => this.tas = tas,
-      err => console.error('Error loading TAs:', err)
-    );
+  private loadCourses() {
+    console.log('Loading courses...');
+    this.courseService.getAllCourses().subscribe({
+      next: (courses: Course[]) => {
+        console.log('Courses loaded:', courses);
+        this.courses = courses;
+      },
+      error: (error: any) => {
+        console.error('Error loading courses:', error);
+      }
+    });
   }
 
+  private loadTAs() {
+    console.log('Loading TAs...');
+    this.taService.getAllTAs().subscribe({
+      next: (tas: TA[]) => {
+        console.log('TAs loaded:', tas);
+        this.tas = tas;
+      },
+      error: (error: any) => {
+        console.error('Error loading TAs:', error);
+      }
+    });
+  }
+
+  private updateAssignmentCounts() {
+    // Update the counts for each exam
+    this.exams.forEach(exam => {
+      this.proctoringAssignmentService.getAssignedProctorCount(exam.id).subscribe({
+        next: (count: number) => {
+          this.assignedCounts[exam.id] = count;
+        },
+        error: (error: any) => {
+          console.error(`Error loading assignments for exam ${exam.id}:`, error);
+        }
+      });
+    });
+  }
+
+  private updateClassroomCounts() {
+    this.exams.forEach(exam => {
+      this.examService.getClassroomsForExam(exam.id).subscribe({
+        next: (classrooms) => {
+          this.classroomCounts[exam.id] = classrooms.length;
+        },
+        error: (err) => {
+          console.error(`Error fetching classrooms for exam ${exam.id}:`, err);
+        }
+      });
+    });
+  }
+  
   getCourseName(courseID: number): string {
-    return this.courses.find(c => c.id === courseID)?.name || 'Unknown Course';
+    const course = this.courses.find(c => c.id === courseID);
+    return course ? course.name : 'Unknown Course';
   }
 
   getCourseCode(courseID: number): string {
-    return this.courses.find(c => c.id === courseID)?.course_code || '??';
+    const course = this.courses.find(c => c.id === courseID);
+    return course ? course.course_code : 'Unknown';
   }
 
-  getDepartmentClass(courseCode: string): string {
-    return `dept-${courseCode.substring(0, 2).toLowerCase()}`;
+  getDepartmentClass(code: string): string {
+    return code.substring(0, 2).toLowerCase();
   }
 
   getAvailableProctors(): number {
-    return this.tas.filter(ta => !ta.isOnLeave && ta.proctoringEnabled).length;
+    return this.tas.length;
   }
 
   getProctorShortage(): number {
-    return this.exams.reduce((total, exam) => {
-      const assigned = this.assignedCounts[exam.id] || 0;
-      const shortage = (exam.proctorsRequired || 0) - assigned;
-      return total + (shortage > 0 ? shortage : 0);
-    }, 0);
+    const totalRequired = this.exams.reduce((sum, exam) => sum + exam.proctorsRequired, 0);
+    const totalAssigned = Object.values(this.assignedCounts).reduce((sum, count) => sum + count, 0);
+    return Math.max(0, totalRequired - totalAssigned);
   }
 
-  assignProctors(examId: number): void {
+  onSearch(event: Event) {
+    const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
+    this.filteredExams = this.exams.filter(exam => 
+      this.getCourseName(exam.courseID).toLowerCase().includes(searchTerm) ||
+      this.getCourseCode(exam.courseID).toLowerCase().includes(searchTerm)
+    );
+  }
+
+  filterByDepartment(event: Event) {
+    const department = (event.target as HTMLSelectElement).value;
+    if (!department) {
+      this.filteredExams = this.exams;
+      return;
+    }
+    this.filteredExams = this.exams.filter(exam => 
+      this.getCourseCode(exam.courseID).startsWith(department)
+    );
+  }
+
+  filterByDate(event: Event) {
+    const filter = (event.target as HTMLSelectElement).value;
+    const now = new Date();
+    switch (filter) {
+      case 'upcoming':
+        this.filteredExams = this.exams.filter(exam => new Date(exam.date) > now);
+        break;
+      case 'past':
+        this.filteredExams = this.exams.filter(exam => new Date(exam.date) <= now);
+        break;
+      default:
+        this.filteredExams = this.exams;
+    }
+  }
+
+  assignProctors(examId: number) {
     this.router.navigate(['/proctoring/assign', examId]);
   }
 
   createNewExam(): void {
     this.router.navigate(['/proctoring/new']);
   }
-
-  onSearch(event: Event): void {
-    this.searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
-    this.applyFilters();
-  }
-
-  filterByDepartment(event: Event): void {
-    this.departmentFilter = (event.target as HTMLSelectElement).value;
-    this.applyFilters();
-  }
-
-  filterByDate(event: Event): void {
-    this.dateFilter = (event.target as HTMLSelectElement).value;
-    this.applyFilters();
-  }
-
-  applyFilters(): void {
-    let filtered = [...this.exams];
-
-    if (this.searchTerm) {
-      filtered = filtered.filter(exam =>
-        this.getCourseName(exam.courseID).toLowerCase().includes(this.searchTerm) ||
-        this.getCourseCode(exam.courseID).toLowerCase().includes(this.searchTerm)
-      );
-    }
-
-    if (this.departmentFilter) {
-      filtered = filtered.filter(exam =>
-        this.getCourseCode(exam.courseID).startsWith(this.departmentFilter)
-      );
-    }
-
-    if (this.dateFilter) {
-      const today = new Date();
-      filtered = filtered.filter(exam => {
-        const examDate = new Date(exam.date);
-        return this.dateFilter === 'upcoming'
-          ? examDate >= today
-          : examDate < today;
-      });
-    }
-
-    this.filteredExams = filtered;
-  }
 }
+

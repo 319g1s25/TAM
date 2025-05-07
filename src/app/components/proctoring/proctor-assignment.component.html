@@ -1,0 +1,102 @@
+<!-- Proctor Assignment Component -->
+<div class="proctor-assignment-container">
+  <div class="header">
+    <h1>Proctor Assignment</h1>
+    <div *ngIf="exam && course" class="exam-info">
+      <h2>Exam #{{ exam.id }}</h2>
+      <p class="course-info">{{ course.course_code }} - {{ course.name }}</p>
+      <p class="exam-details">
+        <span>Date: {{ exam.date | date:'mediumDate' }}</span>
+        <span>Duration: {{ exam.duration }} minutes</span>
+        <span>Proctors Required: {{ exam.proctorsRequired }}</span>
+      </p>
+      
+      <!-- Assigned TAs Section -->
+      <div class="assigned-tas" *ngIf="selectedTAs.length > 0">
+        <h3>Currently Assigned TAs:</h3>
+        <div class="assigned-tas-list">
+          <ng-container *ngFor="let ta of tas">
+            <div *ngIf="selectedTAs.includes(ta.id!)" class="assigned-ta-item">
+              <span class="ta-name">{{ ta.name }}</span>
+              <span class="ta-department">({{ ta.department }})</span>
+            </div>
+          </ng-container>          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="assignment-mode-selector">
+    <button 
+      [class.active]="assignmentMode === 'manual'"
+      (click)="assignmentMode = 'manual'">
+      Manual Assignment
+    </button>
+    <button 
+      [class.active]="assignmentMode === 'auto'"
+      (click)="assignmentMode = 'auto'">
+      Automatic Assignment
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- Manual Assignment Section -->
+    <div *ngIf="assignmentMode === 'manual'" class="manual-assignment">
+      <div class="ta-selection">
+        <h3>Select Proctors ({{ selectedTAs.length }}/{{ exam?.proctorsRequired }})</h3>
+        <div class="ta-list">
+          <div *ngFor="let ta of tas" 
+               class="ta-item"
+               [class.selected]="selectedTAs.includes(ta.id!)"
+               [class.eligible]="isTAEligible(ta)"
+               [class.ineligible]="!isTAEligible(ta)"
+               (click)="toggleTA(ta.id!)">
+            <div class="ta-info">
+              <h4>{{ ta.name }}</h4>
+              <p>Department: {{ ta.department }}</p>
+              <p>Current Workload: {{ ta.totalWorkload }} hours</p>
+            </div>
+            <div class="ta-status">
+              <span *ngIf="selectedTAs.includes(ta.id!)" class="selected-indicator">✓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button 
+          class="assign-button"
+          [disabled]="selectedTAs.length === 0 || selectedTAs.length !== exam?.proctorsRequired"
+          (click)="assignProctors()">
+          Assign Selected Proctors
+        </button>
+      </div>
+    </div>
+
+    <!-- Automatic Assignment Section -->
+    <div *ngIf="assignmentMode === 'auto'" class="auto-assignment">
+      <div class="auto-assign-info">
+        <h3>Automatic Proctor Assignment</h3>
+        <p>The system will automatically assign proctors based on:</p>
+        <ul>
+          <li>Department matching</li>
+          <li>Current workload</li>
+          <li>Availability</li>
+        </ul>
+      </div>
+
+      <div class="action-buttons">
+        <button 
+          class="auto-assign-button"
+          (click)="assignProctorsAutomatically()">
+          Assign Proctors Automatically
+        </button>
+      </div>
+    </div>
+  </div>
+</div> 

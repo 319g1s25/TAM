@@ -19,7 +19,7 @@ export class ExamService {
     proctorsRequired: number;
     classrooms: number[];
   }): Observable<Exam> {
-    return this.http.post<Exam>(this.apiUrl, examData);
+    return this.http.post<Exam>(`${this.apiUrl}`, examData);
   }
 
   getExamById(id: number): Observable<Exam> {

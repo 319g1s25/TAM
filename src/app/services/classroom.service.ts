@@ -7,7 +7,7 @@ import { Classroom } from '../shared/models/classroom.model';
   providedIn: 'root'
 })
 export class ClassroomService {
-  private apiUrl = '/api/classrooms';
+  private apiUrl = 'http://localhost:3000/api/classrooms';
 
   constructor(private http: HttpClient) {}
 

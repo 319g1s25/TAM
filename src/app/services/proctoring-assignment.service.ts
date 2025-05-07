@@ -8,7 +8,7 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class ProctoringAssignmentService {
-  private apiUrl = '/api/proctoring-assignments';
+  private apiUrl = 'http://localhost:3000/api/proctoring-assignments';
 
   constructor(private http: HttpClient) {}
 
@@ -25,7 +25,7 @@ export class ProctoringAssignmentService {
   }
   
   getAssignedProctorCount(examId: number): Observable<number> {
-    return this.http.get<{ assignedCount: number }>(`/api/proctoring-assignments/count/${examId}`)
+    return this.http.get<{ assignedCount: number }>(`${this.apiUrl}/count/${examId}`)
       .pipe(map(res => res.assignedCount));
   }
   

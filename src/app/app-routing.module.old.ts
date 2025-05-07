@@ -4,6 +4,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 import { LeaveRequestFormComponent } from './components/leave-request/leave-request-form.component';
 import { LeaveRequestListComponent } from './components/leave-request/leave-request-list.component';
+import { ExamFormComponent } from './components/proctoring/exam-form.component';
 import { AuthService } from './services/auth.service';
 import { inject } from '@angular/core';
 
@@ -114,7 +115,7 @@ const routes: Routes = [
   },
   { 
     path: 'proctoring/new', 
-    loadComponent: () => import('./components/proctoring/exam-form.component').then(c => c.ExamFormComponent),
+    component: ExamFormComponent,
     canActivate: [RoleGuard],
     data: { roles: ['authstaff', 'deansoffice', 'departmentchair', 'instructor'] }
   },

@@ -9,12 +9,11 @@ import { CourseService } from '../../services/course.service';
 import { Exam } from '../../shared/models/exam.model';
 import { TA } from '../../shared/models/ta.model';
 import { Course } from '../../shared/models/course.model';
-import { IconComponent } from '../shared/icon.component';
 
 @Component({
   selector: 'app-proctor-assignment',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './proctor-assignment.component.html',
   styleUrls: ['./proctor-assignment.component.css']
 })
