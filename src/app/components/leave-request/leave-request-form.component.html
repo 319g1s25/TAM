@@ -1,0 +1,71 @@
+<div class="leave-request-container">
+  <header class="content-header">
+    <h1>Request Leave of Absence</h1>
+    <p class="subtitle">Submit your leave request for approval by instructors</p>
+  </header>
+
+  <div class="card">
+    <div *ngIf="isSubmitting" class="loading-container">
+      <div class="loader"></div>
+      <p>Submitting your request...</p>
+    </div>
+
+    <div *ngIf="!isSubmitting">
+      <form [formGroup]="leaveForm" (ngSubmit)="submitLeaveRequest()" class="leave-form">
+
+        <div class="form-group">
+          <label for="startDate">Start Date <span class="required">*</span></label>
+          <input type="date" id="startDate" formControlName="startDate" class="form-control" [min]="minDate">
+          <div *ngIf="hasError('startDate', 'required')" class="error-message">
+            Start date is required.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="endDate">End Date <span class="required">*</span></label>
+          <input type="date" id="endDate" formControlName="endDate" class="form-control" [min]="endDateMin">
+          <div *ngIf="hasError('endDate', 'required')" class="error-message">
+            End date is required.
+          </div>
+          <div *ngIf="hasError('endDate', 'dateRange')" class="error-message">
+            End date cannot be before start date.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="note">Reason and Details <span class="required">*</span></label>
+          <textarea id="note" formControlName="note" class="form-control" rows="5"
+            placeholder="Explain the reason for your leave (max 400 characters)"></textarea>
+          <div *ngIf="hasError('note', 'required')" class="error-message">
+            This field is required.
+          </div>
+          <div *ngIf="hasError('note', 'minlength')" class="error-message">
+            Must be at least 10 characters long.
+          </div>
+          <div *ngIf="hasError('note', 'maxlength')" class="error-message">
+            Cannot exceed 400 characters.
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" routerLink="/dashboard" class="btn btn-outline">Cancel</button>
+          <button type="submit" [disabled]="leaveForm.invalid || isSubmitting" class="btn btn-primary">
+            <svg *ngIf="isSubmitting" class="svg-icon animate-spin" viewBox="0 0 24 24">
+              <path d="M12 22c5.523 0 10-4.477 10-10h-2c0 4.418-3.582 8-8 8s-8-3.582-8-8 3.582-8 8-8V2C6.477 2 2 6.477 2 12s4.477 10 10 10z"></path>
+            </svg>
+            Submit Request
+          </button>
+        </div>
+      </form>
+
+      <div *ngIf="submitSuccess" class="success-message">
+        {{ successMessage }}
+        <p><a routerLink="/leave-requests" class="link">View my leave requests</a></p>
+      </div>
+
+      <div *ngIf="submitError" class="error-message global-error">
+        {{ errorMessage }}
+      </div>
+    </div>
+  </div>
+</div>

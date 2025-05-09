@@ -303,15 +303,16 @@ DROP TABLE IF EXISTS `leaverequest`;
 CREATE TABLE `leaverequest` (
   `id` int NOT NULL AUTO_INCREMENT,
   `taID` int NOT NULL,
-  `userID` int NOT NULL,
   `startDate` date DEFAULT NULL,
   `endDate` date DEFAULT NULL,
   `status` varchar(45) DEFAULT NULL,
+  `note` varchar(400) ,
+  `reviewedBy` VARCHAR(100) DEFAULT NULL,
+  `reviewDate` DATETIME DEFAULT NULL,
+  `reviewComments` TEXT DEFAULT NULL, 
   PRIMARY KEY (`id`),
   KEY `fk_ta_id` (`taID`),
-  KEY `fk_user_id` (`userID`),
-  CONSTRAINT `fk_ta_id` FOREIGN KEY (`taID`) REFERENCES `ta` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_user_id` FOREIGN KEY (`userID`) REFERENCES `user` (`id`)
+  CONSTRAINT `fk_ta_id` FOREIGN KEY (`taID`) REFERENCES `ta` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

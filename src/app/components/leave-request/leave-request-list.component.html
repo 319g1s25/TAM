@@ -1,0 +1,81 @@
+<div class="leave-request-container">
+  <header class="content-header">
+    <h1>Leave Requests</h1>
+    <p class="subtitle">{{ isAdminView ? 'Manage leave requests submitted by TAs' : 'View your leave request history' }}</p>
+
+    <div class="action-buttons" *ngIf="!isAdminView">
+      <a routerLink="/leave-requests/new" class="btn btn-primary">
+        <svg class="svg-icon" viewBox="0 0 24 24">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+        </svg>
+        Request Leave
+      </a>
+    </div>
+  </header>
+
+  <div class="filter-section" *ngIf="isAdminView">
+    <div class="filter-group">
+      <h2 class="section-title">Filter Requests</h2>
+      <div class="filters">
+        <div class="filter-pills">
+          <span class="filter-label">Status:</span>
+          <button (click)="filterByStatus('all')" class="filter-pill" [class.active]="statusFilter === 'all'">All</button>
+          <button (click)="filterByStatus('pending')" class="filter-pill" [class.active]="statusFilter === 'pending'">Pending</button>
+          <button (click)="filterByStatus('approved')" class="filter-pill" [class.active]="statusFilter === 'approved'">Approved</button>
+          <button (click)="filterByStatus('rejected')" class="filter-pill" [class.active]="statusFilter === 'rejected'">Rejected</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loader"></div>
+    <p>Loading leave requests...</p>
+  </div>
+
+  <div *ngIf="!isLoading && filteredRequests.length > 0" class="leave-request-list">
+    <div class="request-card" *ngFor="let request of filteredRequests">
+      <div class="request-header">
+        <div class="request-info">
+          <span class="request-dates">{{ request.startDate | date:'mediumDate' }} - {{ request.endDate | date:'mediumDate' }}</span>
+        </div>
+        <span [class]="'status-badge status-' + request.status">{{ request.status | titlecase }}</span>
+      </div>
+
+      <div class="request-content">
+        <div class="request-row" *ngIf="request.taName">
+          <span class="label">TA Name:</span>
+          <span class="value">{{ request.taName }}</span>
+        </div>
+        <div class="request-row" *ngIf="request.department">
+          <span class="label">Department:</span>
+          <span class="value">{{ request.department }}</span>
+        </div>
+        <div class="request-row">
+          <span class="label">Reason:</span>
+          <span class="value details-text">{{ request.note }}</span>
+        </div>
+
+        <div class="request-row" *ngIf="request.reviewedBy">
+          <span class="label">Reviewed by:</span>
+          <span class="value">{{ request.reviewedBy }} on {{ request.reviewDate | date:'mediumDate' }}</span>
+        </div>
+
+        <div class="request-row" *ngIf="request.reviewComments">
+          <span class="label">Comments:</span>
+          <span class="value comments-text">{{ request.reviewComments }}</span>
+        </div>
+      </div>
+
+      <div class="request-actions" *ngIf="(isDeansOffice || isAuthStaff) && request.status.toLowerCase() === 'pending'">
+        <button (click)="approveRequest(request.id)" class="btn btn-outline approve-btn">Approve</button>
+        <button (click)="rejectRequest(request.id)" class="btn btn-outline reject-btn">Reject</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && filteredRequests.length === 0" class="no-data">
+    <p>No leave requests found.</p>
+    <a *ngIf="!isAdminView" routerLink="/leave-requests/new" class="btn btn-primary">Request Leave</a>
+  </div>
+</div>

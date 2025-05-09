@@ -13,6 +13,7 @@ const taAssignmentRoutes = require('./routes/ta-assignment.router');
 const examRoutes = require('./routes/exam.router');
 const classroomRoutes = require('./routes/classroom.router');
 const proctoringRoutes = require('./routes/proctoring-assignment.router');
+const leaveRequestRoutes = require('./routes/leave-request.router');
 
 console.log('Exam routes:', examRoutes);
 
@@ -35,6 +36,7 @@ app.use('/api/ta-assignments', taAssignmentRoutes);
 app.use('/api/exams', examRoutes);
 app.use('/api/classrooms', classroomRoutes);
 app.use('/api/proctoring-assignments', proctoringRoutes);
+app.use('/api/leave-requests', leaveRequestRoutes);
 
 // Start the server
 async function startServer() {

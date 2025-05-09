@@ -146,16 +146,16 @@
       </div>
     </div>
 
-    <!-- Add Leave Request card for TAs -->
-    <div class="card" *ngIf="authService.isTA">
+    <!-- Leave Management card for all users -->
+    <div class="card">
       <div class="card-header">
         <h2>Leave Management</h2>
         <span class="card-badge">{{ stats.leaveRequestCount || 0 }}</span>
       </div>
-      <p>Submit leave requests and check approval status</p>
+      <p>{{ authService.isTA ? 'Submit leave requests and check approval status' : 'View and manage TA leave requests' }}</p>
       <div class="card-actions">
         <a routerLink="/leave-requests" class="btn btn-primary">View Requests</a>
-        <a routerLink="/leave-requests/new" class="btn btn-outline">Request Leave</a>
+        <a routerLink="/leave-requests/new" class="btn btn-outline" *ngIf="authService.isTA">Request Leave</a>
       </div>
     </div>
   </div>
