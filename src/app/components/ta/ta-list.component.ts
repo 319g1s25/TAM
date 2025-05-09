@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TA  } from '../../shared/models/ta.model';
 import { TAService } from '../../services/ta.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-ta-list',
@@ -14,12 +15,22 @@ import { TAService } from '../../services/ta.service';
 export class TAListComponent implements OnInit {
   tas: TA[] = [];
   filteredTAs: TA[] = [];
+  canManageTAs = false;
 
   
-  constructor(private taService: TAService) {}
+  constructor(
+    private taService: TAService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
+    this.checkPermissions();
     this.loadTAs();
+  }
+  
+  checkPermissions(): void {
+    const adminRoles = ['authstaff', 'deansoffice', 'departmentchair'];
+    this.canManageTAs = this.authService.hasRole(adminRoles);
   }
   
   loadTAs(): void {
@@ -45,6 +56,8 @@ export class TAListComponent implements OnInit {
   }
   
   deleteTA(id: number): void {
+    if (!this.canManageTAs) return;
+    
     if (confirm('Are you sure you want to delete this TA?')) {
       this.taService.deleteTA(id).subscribe(
         () => {

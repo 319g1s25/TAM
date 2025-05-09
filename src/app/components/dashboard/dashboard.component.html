@@ -83,7 +83,7 @@
       <p>Manage teaching assistants and their assignments</p>
       <div class="card-actions">
         <a routerLink="/tas" class="btn btn-primary">View TAs</a>
-        <a routerLink="/tas/new" class="btn btn-outline">Add New</a>
+        <a *ngIf="hasAdminRights()" routerLink="/tas/new" class="btn btn-outline">Add New</a>
       </div>
     </div>
     
@@ -95,7 +95,7 @@
       <p>Add, edit or remove courses and their details</p>
       <div class="card-actions">
         <a routerLink="/courses" class="btn btn-primary">View Courses</a>
-        <a routerLink="/courses/new" class="btn btn-outline">Add New</a>
+        <a *ngIf="hasAdminRights()" routerLink="/courses/new" class="btn btn-outline">Add New</a>
       </div>
     </div>
     
@@ -119,7 +119,7 @@
       <p>Create and manage TA assignments to courses</p>
       <div class="card-actions">
         <a routerLink="/assignments" class="btn btn-primary">View Assignments</a>
-        <a routerLink="/assignments/add" class="btn btn-outline">Add New</a>
+        <a *ngIf="canManageAssignments()" routerLink="/assignments/add" class="btn btn-outline">Add New</a>
       </div>
     </div>
     
@@ -131,7 +131,7 @@
       <p>Schedule exams and manage proctoring assignments</p>
       <div class="card-actions">
         <a routerLink="/proctoring" class="btn btn-primary">View Exams</a>
-        <a routerLink="/proctoring/new" class="btn btn-outline">Schedule Exam</a>
+        <a *ngIf="canManageExams()" routerLink="/proctoring/new" class="btn btn-outline">Schedule Exam</a>
       </div>
     </div>
     

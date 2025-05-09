@@ -40,13 +40,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.userSubscription = this.authService.currentUser.subscribe((user: User | null) => {
+    this.userSubscription = this.authService.currentUser.subscribe(user => {
       this.currentUser = user;
-      this.updateWelcomeMessage();
+      this.setWelcomeMessage();
     });
 
-    this.loadStats();
-    //this.loadUrgentTasks();
+    this.loadDashboardStats();
   }
 
   ngOnDestroy(): void {
@@ -55,13 +54,49 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private loadStats(): void {
+  private setWelcomeMessage(): void {
+    if (this.currentUser) {
+      const role = this.currentUser.role;
+      const time = new Date().getHours();
+      let greeting = '';
+      
+      if (time < 12) {
+        greeting = 'Good morning';
+      } else if (time < 18) {
+        greeting = 'Good afternoon';
+      } else {
+        greeting = 'Good evening';
+      }
+
+      switch(role) {
+        case 'authstaff':
+          this.welcomeMessage = `${greeting}! Welcome to the Auth Staff dashboard.`;
+          break;
+        case 'deansoffice':
+          this.welcomeMessage = `${greeting}! Welcome to the Dean's Office dashboard.`;
+          break;
+        case 'departmentchair':
+          this.welcomeMessage = `${greeting}! Welcome to the Department Chair dashboard.`;
+          break;
+        case 'instructor':
+          this.welcomeMessage = `${greeting}! Welcome to the Instructor dashboard.`;
+          break;
+        case 'ta':
+          this.welcomeMessage = `${greeting}! Welcome to the TA dashboard.`;
+          break;
+        default:
+          this.welcomeMessage = 'Welcome to your Dashboard';
+      }
+    }
+  }
+
+  private loadDashboardStats(): void {
     this.dashboardService.getStats().subscribe({
-      next: (res) => {
-        if (res.success) {
+      next: (response: any) => {
+        if (response.success) {
           this.stats = {
-            ...res.stats,
-            examCount: res.stats.examCount || 0
+            ...response.stats,
+            examCount: response.stats.examCount || 0
           };
         }
       },
@@ -70,39 +105,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     });
   }
-
-  /*private loadUrgentTasks(): void {
-    this.dashboardService.getUrgentTasks().subscribe({
-      next: (tasks: UrgentTask[]) => {
-        this.urgentTasks = tasks;
-      },
-      error: (error: Error) => {
-        console.error('Error loading urgent tasks:', error);
-      }
-    });
-  }*/
-
-  private updateWelcomeMessage(): void {
-    if (this.currentUser) {
-      switch (this.currentUser.role) {
-        case 'authstaff':
-          this.welcomeMessage = 'Welcome to the TA Management System';
-          break;
-        case 'instructor':
-          this.welcomeMessage = 'Welcome to your Course Management Dashboard';
-          break;
-        case 'ta':
-          this.welcomeMessage = 'Welcome to your TA Dashboard';
-          break;
-        case 'deansoffice':
-          this.welcomeMessage = 'Welcome to the Dean\'s Office Dashboard';
-          break;
-        case 'departmentchair':
-          this.welcomeMessage = 'Welcome Department Chair';
-          break;
-        default:
-          this.welcomeMessage = 'Welcome to your Dashboard';
-      }
-    }
+  
+  // Permission check methods
+  hasAdminRights(): boolean {
+    const adminRoles = ['authstaff', 'deansoffice', 'departmentchair'];
+    return this.currentUser ? adminRoles.includes(this.currentUser.role) : false;
+  }
+  
+  canManageAssignments(): boolean {
+    const allowedRoles = ['authstaff', 'deansoffice', 'departmentchair', 'instructor'];
+    return this.currentUser ? allowedRoles.includes(this.currentUser.role) : false;
+  }
+  
+  canManageExams(): boolean {
+    const allowedRoles = ['authstaff', 'deansoffice', 'departmentchair', 'instructor'];
+    return this.currentUser ? allowedRoles.includes(this.currentUser.role) : false;
   }
 }

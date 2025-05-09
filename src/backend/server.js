@@ -15,15 +15,27 @@ const classroomRoutes = require('./routes/classroom.router');
 const proctoringRoutes = require('./routes/proctoring-assignment.router');
 const leaveRequestRoutes = require('./routes/leave-request.router');
 
-console.log('Exam routes:', examRoutes);
+console.log('Starting server...');
+console.log('Loaded routes:');
+console.log('- Exam routes loaded');
+console.log('- Classroom routes loaded');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*', // Allow all origins for development
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use(morgan('dev'));
+
+// Add a basic route for testing
+app.get('/', (req, res) => {
+  res.json({ message: 'TAM API is running' });
+});
 
 // Routes
 // TODO: Add routes here
@@ -42,12 +54,23 @@ app.use('/api/leave-requests', leaveRequestRoutes);
 async function startServer() {
   try {
     // Test database connection
+    console.log('Testing database connection...');
     const connected = await db.testConnection();
     if (connected) {
+      console.log('Database connection successful!');
+      
+      // Initialize database if needed
+      try {
+        await db.ensureClassroomsExist();
+        console.log('Database initialized successfully');
+      } catch (error) {
+        console.error('Error initializing database:', error);
+      }
       
       // Start listening
       app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
+        console.log(`API accessible at http://localhost:${PORT}`);
       });
     } else {
       console.error('Server failed to start due to database connection issues');

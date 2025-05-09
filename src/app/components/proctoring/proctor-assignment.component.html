@@ -26,7 +26,8 @@
     </div>
   </div>
 
-  <div class="assignment-mode-selector">
+  <!-- Only show assignment mode selector if user has permissions -->
+  <div *ngIf="canAssignProctors" class="assignment-mode-selector">
     <button 
       [class.active]="assignmentMode === 'manual'"
       (click)="assignmentMode = 'manual'">
@@ -45,16 +46,34 @@
   </div>
 
   <div *ngIf="!loading">
-    <!-- Manual Assignment Section -->
-    <div *ngIf="assignmentMode === 'manual'" class="manual-assignment">
+    <!-- Manual Assignment Section (with permission check) -->
+    <div *ngIf="assignmentMode === 'manual' && canAssignProctors" class="manual-assignment">
       <div class="ta-selection">
-        <h3>Select Proctors ({{ selectedTAs.length }}/{{ exam?.proctorsRequired }})</h3>
+        <div class="selection-header">
+          <h3>Select Proctors ({{ selectedTAs.length }}/{{ exam?.proctorsRequired }})</h3>
+          
+          <!-- Sorting Controls -->
+          <div class="sorting-controls">
+            <label for="sort-options">Sort by:</label>
+            <select 
+              id="sort-options" 
+              [(ngModel)]="currentSort" 
+              (change)="sortTAs(currentSort)" 
+              class="sort-select">
+              <option *ngFor="let option of sortOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+        
         <div class="ta-list">
           <div *ngFor="let ta of tas" 
                class="ta-item"
                [class.selected]="selectedTAs.includes(ta.id!)"
                [class.eligible]="isTAEligible(ta)"
                [class.ineligible]="!isTAEligible(ta)"
+               [class.clickable]="canAssignProctors && isTAEligible(ta)"
                (click)="toggleTA(ta.id!)">
             <div class="ta-info">
               <h4>{{ ta.name }}</h4>
@@ -68,7 +87,7 @@
         </div>
       </div>
 
-      <div class="action-buttons">
+      <div *ngIf="canAssignProctors" class="action-buttons">
         <button 
           class="assign-button"
           [disabled]="selectedTAs.length === 0 || selectedTAs.length !== exam?.proctorsRequired"
@@ -78,8 +97,14 @@
       </div>
     </div>
 
-    <!-- Automatic Assignment Section -->
-    <div *ngIf="assignmentMode === 'auto'" class="auto-assignment">
+    <!-- Read-only view for non-authorized users -->
+    <div *ngIf="!canAssignProctors" class="view-only-message">
+      <p>You don't have permission to assign proctors.</p>
+      <p>Contact an administrator, department chair, dean's office, or instructor for assistance.</p>
+    </div>
+
+    <!-- Automatic Assignment Section (with permission check) -->
+    <div *ngIf="assignmentMode === 'auto' && canAssignProctors" class="auto-assignment">
       <div class="auto-assign-info">
         <h3>Automatic Proctor Assignment</h3>
         <p>The system will automatically assign proctors based on:</p>
@@ -99,4 +124,51 @@
       </div>
     </div>
   </div>
-</div> 
+</div>
+
+<style>
+  .selection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .sorting-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .sort-select {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: white;
+    font-size: 14px;
+    min-width: 200px;
+  }
+  
+  .sort-select:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
+  
+  .clickable {
+    cursor: pointer;
+  }
+  
+  .view-only-message {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: center;
+    color: #6c757d;
+  }
+  
+  .view-only-message p {
+    margin-bottom: 10px;
+  }
+</style> 

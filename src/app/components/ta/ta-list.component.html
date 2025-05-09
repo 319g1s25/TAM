@@ -1,7 +1,7 @@
 <div class="content-container">
     <header class="content-header">
       <h1>Teaching Assistants</h1>
-      <button class="btn btn-accent" routerLink="/tas/new">
+      <button *ngIf="canManageTAs" class="btn btn-accent" routerLink="/tas/new">
         <svg class="svg-icon" viewBox="0 0 24 24">
           <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
         </svg>
@@ -67,8 +67,8 @@
               <td>
                 <div class="action-buttons">
                   <button class="btn btn-sm" [routerLink]="['/tas', ta.id]">View</button>
-                  <button class="btn btn-sm btn-accent" [routerLink]="['/tas', ta.id, 'edit']">Edit</button>
-                  <button class="btn btn-sm btn-danger-outline" (click)="deleteTA(ta.id!)">Delete</button>
+                  <button *ngIf="canManageTAs" class="btn btn-sm btn-accent" [routerLink]="['/tas', ta.id, 'edit']">Edit</button>
+                  <button *ngIf="canManageTAs" class="btn btn-sm btn-danger-outline" (click)="deleteTA(ta.id!)">Delete</button>
                 </div>
               </td>
             </tr>

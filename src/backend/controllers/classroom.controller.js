@@ -2,8 +2,15 @@ const db = require('../db');
 
 // Get all classrooms
 exports.getAllClassrooms = async (req, res) => {
+  console.log('getAllClassrooms called');
   try {
     const classrooms = await db.query('SELECT * FROM classroom');
+    console.log('Classrooms fetched from DB:', classrooms);
+    
+    if (!classrooms || classrooms.length === 0) {
+      console.log('No classrooms found in the database');
+    }
+    
     res.status(200).json(classrooms);
   } catch (err) {
     console.error('Error fetching classrooms:', err);

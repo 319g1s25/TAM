@@ -1,13 +1,13 @@
-<div class="login-container">
-  <div class="login-card">
-    <div class="login-header">
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
       <h1>TAM</h1>
-      <h2>Teaching Assistant Management</h2>
+      <p>Teaching Assistant Management</p>
     </div>
 
-    <div class="login-form">
+    <div class="auth-body">
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <div class="form-group">
+        <div class="form-field">
           <label for="email">Email</label>
           <input 
             type="email" 
@@ -18,11 +18,11 @@
           >
           <div class="error-message" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
             <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</span>
-            <span *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+            <span *ngIf="loginForm.get('email')?.errors?.['email']">Invalid email format</span>
           </div>
         </div>
         
-        <div class="form-group">
+        <div class="form-field">
           <label for="password">Password</label>
           <input 
             type="password" 
@@ -47,36 +47,9 @@
           [disabled]="loginForm.invalid || isLoading"
         >
           <span *ngIf="!isLoading">Login</span>
-          <span *ngIf="isLoading" class="loading-spinner"></span>
+          <div *ngIf="isLoading" class="spinner"></div>
         </button>
       </form>
-    </div>
-    
-    <div class="demo-section">
-      <h3>Demo Login Options</h3>
-      <div class="demo-buttons">
-        <button 
-          class="demo-button admin" 
-          (click)="loginAsDemo('admin')" 
-          [disabled]="isLoading"
-        >
-          Login as Admin
-        </button>
-        <button 
-          class="demo-button coordinator" 
-          (click)="loginAsDemo('coordinator')" 
-          [disabled]="isLoading"
-        >
-          Login as Coordinator
-        </button>
-        <button 
-          class="demo-button ta" 
-          (click)="loginAsDemo('ta')" 
-          [disabled]="isLoading"
-        >
-          Login as TA
-        </button>
-      </div>
     </div>
   </div>
 </div> 

@@ -55,7 +55,7 @@
     <div class="assigned-tas-card">
       <div class="card-header">
         <h2>Assigned Proctors</h2>
-        <button class="assign-button" (click)="goToAssignProctors()">
+        <button *ngIf="canManageProctors" class="assign-button" (click)="goToAssignProctors()">
           Manage Proctors
         </button>
       </div>

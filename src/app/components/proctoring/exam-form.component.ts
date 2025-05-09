@@ -21,6 +21,7 @@ export class ExamFormComponent implements OnInit {
   classrooms: Classroom[] = [];
   selectedClassrooms: number[] = [];
   currentUserId: string = '';
+  errorMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -60,9 +61,11 @@ export class ExamFormComponent implements OnInit {
     this.courseService.getAllCourses().subscribe(
       courses => {
         this.courses = courses;
+        console.log('Loaded courses:', this.courses);
       },
       error => {
         console.error('Error loading courses:', error);
+        this.errorMessage = 'Failed to load courses. Please try again.';
       }
     );
   }
@@ -70,21 +73,48 @@ export class ExamFormComponent implements OnInit {
   loadClassrooms(): void {
     this.classroomService.getAllClassrooms().subscribe(
       classrooms => {
-        this.classrooms = classrooms;
+        console.log('Raw classroom data:', classrooms);
+        
+        if (!classrooms || classrooms.length === 0) {
+          this.errorMessage = 'No classrooms available. Please contact administrator.';
+          console.error('No classrooms found.');
+          return;
+        }
+        
+        // Ensure classrooms data is properly formatted
+        this.classrooms = classrooms.map(classroom => {
+          // Make sure each classroom has the required fields
+          if (typeof classroom === 'object' && classroom !== null) {
+            return {
+              id: classroom.id || 0,
+              room: classroom.room || '',
+              capacity: classroom.capacity || 0,
+              examCapacity: classroom.examCapacity || 0
+            };
+          } else {
+            console.error('Invalid classroom data format:', classroom);
+            return null;
+          }
+        }).filter(c => c !== null) as Classroom[];
+        
+        console.log('Processed classrooms:', this.classrooms);
       },
       error => {
         console.error('Error loading classrooms:', error);
+        this.errorMessage = 'Failed to load classrooms. Please try again.';
       }
     );
   }
 
   toggleClassroomSelection(classroomId: number): void {
+    console.log('Toggle classroom selection:', classroomId);
     const index = this.selectedClassrooms.indexOf(classroomId);
     if (index === -1) {
       this.selectedClassrooms.push(classroomId);
     } else {
       this.selectedClassrooms.splice(index, 1);
     }
+    console.log('Selected classrooms:', this.selectedClassrooms);
     this.examForm.patchValue({ classrooms: this.selectedClassrooms });
   }
 
@@ -106,6 +136,7 @@ export class ExamFormComponent implements OnInit {
         },
         error => {
           console.error('Error creating exam:', error);
+          this.errorMessage = 'Failed to create exam. Please try again.';
         }
       );
     }

@@ -1,58 +1,43 @@
 <div class="proctoring-container">
-  <div class="header">
-    <h1>Manage Exams</h1>
-    <button class="btn btn-primary" routerLink="/proctoring/new">
-      <app-icon name="plus"></app-icon>
-      Create Exam
-    </button>    
-  </div>
-
-  <div class="stats-container">
-    <div class="stat-card">
-      <h3>Available Proctors</h3>
-      <p class="stat-value">{{ getAvailableProctors() }}</p>
-    </div>
-    <div class="stat-card">
-      <h3>Proctor Shortage</h3>
-      <p class="stat-value">{{ getProctorShortage() }}</p>
-    </div>
-  </div>
-
-  <div class="filters">
-    <div class="search-box">
-      <app-icon name="search"></app-icon>
-      <input
-        type="text"
-        placeholder="Search exams..."
-        (input)="onSearch($event)"
-      >
-    </div>
-
-    <div class="filter-group">
-      <select (change)="filterByDepartment($event)">
-        <option value="">All Departments</option>
-        <option value="CS">Computer Science</option>
-        <option value="MA">Mathematics</option>
-        <option value="PH">Physics</option>
-      </select>
-
-      <select (change)="filterByDate($event)">
-        <option value="">All Dates</option>
-        <option value="upcoming">Upcoming</option>
-        <option value="past">Past</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="exams-list">
-    <div *ngFor="let exam of filteredExams" class="exam-card">
-      <div class="exam-header">
-        <span class="department-badge" [ngClass]="getDepartmentClass(getCourseCode(exam.courseID))">
-          {{ getCourseCode(exam.courseID) }}
-        </span>
-        <span class="status-badge">pending</span>
+  <header>
+    <div class="header-content">
+      <h1>Exam Proctoring Management</h1>
+      <div class="quick-stats">
+        <div class="stat-card">
+          <div class="stat-value">{{ exams.length }}</div>
+          <div class="stat-label">Total Exams</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ getAvailableProctors() }}</div>
+          <div class="stat-label">Available Proctors</div>
+        </div>
+        <div class="stat-card" [class.warning]="getProctorShortage() > 0">
+          <div class="stat-value">{{ getProctorShortage() }}</div>
+          <div class="stat-label">Proctor Shortage</div>
+        </div>
       </div>
+    </div>
+    
+    <div class="actions">
+      <div class="search-bar">
+        <input 
+          type="text" 
+          placeholder="Search exams..." 
+          [(ngModel)]="searchTerm"
+          (input)="onSearch($event)">
+        <!-- Additional search controls could go here -->
+      </div>
+      
+      <!-- Only show create exam button for authorized users -->
+      <button *ngIf="canManageProctors" class="create-button" (click)="createNewExam()">
+        <span class="icon">+</span>
+        <span>Create Exam</span>
+      </button>
+    </div>
+  </header>
 
+  <div class="exam-cards">
+    <div *ngFor="let exam of filteredExams" class="exam-card">
       <div class="exam-content">
         <h3>{{ getCourseName(exam.courseID) }}</h3>
         <p class="exam-date">
@@ -80,6 +65,7 @@
           View Details
         </a>
         <button
+          *ngIf="canManageProctors"
           class="btn btn-primary"
           (click)="assignProctors(exam.id)">
           Assign Proctors

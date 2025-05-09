@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ExamService } from '../../services/exam.service';
 import { CourseService } from '../../services/course.service';
 import { ProctoringAssignmentService } from '../../services/proctoring-assignment.service';
+import { AuthService } from '../../services/auth.service';
 import { Exam } from '../../shared/models/exam.model';
 import { Course } from '../../shared/models/course.model';
 import { TA } from '../../shared/models/ta.model';
@@ -22,20 +23,32 @@ export class ExamDetailsComponent implements OnInit {
   assignedTAs: TA[] = [];
   classrooms: { id: number; name: string }[] = [];
   loading = false;
+  
+  // Authorization flags
+  canManageProctors = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private examService: ExamService,
     private courseService: CourseService,
-    private proctoringAssignmentService: ProctoringAssignmentService
+    private proctoringAssignmentService: ProctoringAssignmentService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    // Check user permissions
+    this.checkPermissions();
+    
     const examId = Number(this.route.snapshot.paramMap.get('id'));
     if (examId) {
       this.loadExam(examId);
     }
+  }
+  
+  checkPermissions(): void {
+    const allowedRoles = ['authstaff', 'deansoffice', 'departmentchair', 'instructor'];
+    this.canManageProctors = this.authService.hasRole(allowedRoles);
   }
 
   loadExam(id: number): void {
@@ -84,13 +97,13 @@ export class ExamDetailsComponent implements OnInit {
     });
   }
 
-  goToAssignProctors(): void {
-    if (this.exam) {
-      this.router.navigate(['/proctoring/assign', this.exam.id]);
-    }
-  }
-
   goBack(): void {
     this.router.navigate(['/proctoring']);
+  }
+
+  goToAssignProctors(): void {
+    if (this.exam && this.canManageProctors) {
+      this.router.navigate(['/proctoring/assign', this.exam.id]);
+    }
   }
 } 

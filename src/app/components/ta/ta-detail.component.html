@@ -62,7 +62,8 @@
       </div>
 
       <div class="action-buttons">
-        <button class="btn btn-accent" (click)="onEdit()">Edit TA</button>
+        <!-- Only show Edit button for users with appropriate permissions -->
+        <button *ngIf="canEditTA" class="btn btn-accent" (click)="onEdit()">Edit TA</button>
         <button class="btn btn-secondary" (click)="onBack()">Back to List</button>
       </div>
     </div>

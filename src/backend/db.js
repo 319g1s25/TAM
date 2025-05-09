@@ -1,20 +1,26 @@
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
-console.log('DB ENV VALUES:', {
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  host: process.env.DB_HOST,
-  name: process.env.DB_NAME
+// Set default credentials for development (Docker setup)
+const DB_HOST = 'mysql';  // Using Docker container name
+const DB_USER = 'root';
+const DB_PASSWORD = 'cs319Team1.#';
+const DB_NAME = 'ta_management';
+const DB_PORT = 3306;
+
+console.log('DB Connection Values:', {
+  host: DB_HOST,
+  user: DB_USER,
+  database: DB_NAME
 });
 
 // Create connection pool
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'ta_management', // <- Use 'ta_management'
-  port: process.env.DB_PORT || 3306,
+  host: DB_HOST,
+  user: DB_USER,
+  password: DB_PASSWORD,
+  database: DB_NAME,
+  port: DB_PORT,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
@@ -26,10 +32,37 @@ async function testConnection() {
     const connection = await pool.getConnection();
     console.log('MySQL connection successful!');
     connection.release();
+    
+    // Check and seed classrooms if needed
+    await ensureClassroomsExist();
+    
     return true;
   } catch (error) {
     console.error('MySQL connection failed:', error.message);
     return false;
+  }
+}
+
+// Ensure classrooms exist in the database
+async function ensureClassroomsExist() {
+  try {
+    const classrooms = await query('SELECT * FROM classroom');
+    
+    if (!classrooms || classrooms.length === 0) {
+      console.log('No classrooms found in database. Creating sample classrooms...');
+      
+      // Insert default classrooms
+      await query(
+        'INSERT INTO classroom (room, capacity, examCapacity) VALUES (?, ?, ?), (?, ?, ?)',
+        ['BZ102', 64, 32, 'BZ103', 64, 32]
+      );
+      
+      console.log('Sample classrooms created successfully');
+    } else {
+      console.log(`Found ${classrooms.length} classrooms in the database`);
+    }
+  } catch (error) {
+    console.error('Error ensuring classrooms exist:', error.message);
   }
 }
 
@@ -47,5 +80,6 @@ async function query(sql, params) {
 module.exports = {
   query,
   testConnection,
-  getConnection: () => pool.getConnection()
+  getConnection: () => pool.getConnection(),
+  ensureClassroomsExist
 };

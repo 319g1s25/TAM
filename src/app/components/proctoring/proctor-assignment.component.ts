@@ -6,9 +6,13 @@ import { ExamService } from '../../services/exam.service';
 import { TAService } from '../../services/ta.service';
 import { ProctoringAssignmentService } from '../../services/proctoring-assignment.service';
 import { CourseService } from '../../services/course.service';
+import { AuthService } from '../../services/auth.service';
 import { Exam } from '../../shared/models/exam.model';
 import { TA } from '../../shared/models/ta.model';
 import { Course } from '../../shared/models/course.model';
+
+// Define sort options type
+type SortOption = 'workload-asc' | 'workload-desc' | 'name-asc' | 'name-desc' | 'department-asc' | 'department-desc';
 
 @Component({
   selector: 'app-proctor-assignment',
@@ -20,10 +24,25 @@ import { Course } from '../../shared/models/course.model';
 export class ProctorAssignmentComponent implements OnInit {
   exam: Exam | null = null;
   tas: TA[] = [];
+  filteredTAs: TA[] = [];
   selectedTAs: number[] = [];
   course: Course | null = null;
   assignmentMode: 'manual' | 'auto' = 'manual';
   loading = false;
+  currentSort: SortOption = 'workload-asc';
+  
+  // Authorization flags
+  canAssignProctors = false;
+  
+  // Make sort options available to template
+  sortOptions = [
+    { value: 'workload-asc', label: 'Workload (Low to High)' },
+    { value: 'workload-desc', label: 'Workload (High to Low)' },
+    { value: 'name-asc', label: 'Name (A-Z)' },
+    { value: 'name-desc', label: 'Name (Z-A)' },
+    { value: 'department-asc', label: 'Department (A-Z)' },
+    { value: 'department-desc', label: 'Department (Z-A)' }
+  ];
 
   constructor(
     private route: ActivatedRoute,
@@ -31,14 +50,28 @@ export class ProctorAssignmentComponent implements OnInit {
     private examService: ExamService,
     private taService: TAService,
     private courseService: CourseService,
-    private proctoringAssignmentService: ProctoringAssignmentService
+    private proctoringAssignmentService: ProctoringAssignmentService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    // Check permissions
+    this.checkPermissions();
+    
     const examId = Number(this.route.snapshot.paramMap.get('id'));
     if (examId) {
       this.loadExam(examId);
       this.loadTAs();
+    }
+  }
+  
+  checkPermissions(): void {
+    const allowedRoles = ['authstaff', 'deansoffice', 'departmentchair', 'instructor'];
+    this.canAssignProctors = this.authService.hasRole(allowedRoles);
+    
+    // If user doesn't have permission, redirect to dashboard
+    if (!this.canAssignProctors) {
+      this.router.navigate(['/dashboard']);
     }
   }
 
@@ -69,6 +102,7 @@ export class ProctorAssignmentComponent implements OnInit {
     this.taService.getAllTAs().subscribe(
       tas => {
         this.tas = tas.filter(ta => !ta.isOnLeave && ta.proctoringEnabled);
+        this.applySort(this.currentSort);
       },
       error => {
         console.error('Error loading TAs:', error);
@@ -90,6 +124,8 @@ export class ProctorAssignmentComponent implements OnInit {
   }
 
   toggleTA(taId: number): void {
+    if (!this.canAssignProctors) return;
+    
     const index = this.selectedTAs.indexOf(taId);
     if (index === -1 && this.selectedTAs.length < (this.exam?.proctorsRequired || 0)) {
       this.selectedTAs.push(taId);
@@ -99,7 +135,7 @@ export class ProctorAssignmentComponent implements OnInit {
   }
 
   assignProctors(): void {
-    if (!this.exam || this.selectedTAs.length === 0) return;
+    if (!this.canAssignProctors || !this.exam || this.selectedTAs.length === 0) return;
 
     this.loading = true;
     this.proctoringAssignmentService.assignProctors(this.exam.id, this.selectedTAs).subscribe(
@@ -115,7 +151,7 @@ export class ProctorAssignmentComponent implements OnInit {
   }
 
   assignProctorsAutomatically(): void {
-    if (!this.exam) return;
+    if (!this.canAssignProctors || !this.exam) return;
   
     this.loading = true;
   
@@ -144,5 +180,38 @@ export class ProctorAssignmentComponent implements OnInit {
     if (ta.totalWorkload >= 40) return false;
 
     return true;
+  }
+  
+  // Sort TAs based on selected criteria
+  sortTAs(sortOption: SortOption): void {
+    this.currentSort = sortOption;
+    this.applySort(sortOption);
+  }
+  
+  private applySort(sortOption: SortOption): void {
+    const sortedTAs = [...this.tas];
+    
+    switch(sortOption) {
+      case 'workload-asc':
+        sortedTAs.sort((a, b) => a.totalWorkload - b.totalWorkload);
+        break;
+      case 'workload-desc':
+        sortedTAs.sort((a, b) => b.totalWorkload - a.totalWorkload);
+        break;
+      case 'name-asc':
+        sortedTAs.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'name-desc':
+        sortedTAs.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'department-asc':
+        sortedTAs.sort((a, b) => a.department.localeCompare(b.department));
+        break;
+      case 'department-desc':
+        sortedTAs.sort((a, b) => b.department.localeCompare(a.department));
+        break;
+    }
+    
+    this.tas = sortedTAs;
   }
 }

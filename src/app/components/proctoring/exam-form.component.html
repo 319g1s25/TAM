@@ -1,5 +1,10 @@
 <div class="exam-form-container">
   <h2>Create New Exam</h2>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+  
   <form [formGroup]="examForm" (ngSubmit)="onSubmit()" class="exam-form">
     <div class="form-group">
       <label for="courseId">Course</label>
@@ -28,7 +33,10 @@
 
     <div class="form-group">
       <label>Classrooms</label>
-      <div class="classroom-selection">
+      <div *ngIf="classrooms.length === 0" class="no-data">
+        Loading classrooms or no classrooms available...
+      </div>
+      <div *ngIf="classrooms.length > 0" class="classroom-selection">
         <div *ngFor="let classroom of classrooms" class="classroom-option">
           <input
             type="checkbox"
@@ -37,10 +45,14 @@
             (change)="toggleClassroomSelection(classroom.id)"
           >
           <label [for]="'classroom-' + classroom.id">
-            {{ classroom.room }} (Capacity: {{ classroom.capacity }})
+            {{ classroom.room }} (Capacity: {{ classroom.capacity }}, Exam Capacity: {{ classroom.examCapacity }})
           </label>
         </div>
       </div>
+    </div>
+
+    <div *ngIf="selectedClassrooms.length > 0" class="selected-classrooms">
+      <p>Selected classrooms: {{ selectedClassrooms.length }}</p>
     </div>
 
     <div class="form-actions">
@@ -48,4 +60,29 @@
       <button type="button" (click)="router.navigate(['/proctoring'])" class="btn btn-secondary">Cancel</button>
     </div>
   </form>
-</div> 
+</div>
+
+<style>
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+.no-data {
+  font-style: italic;
+  color: #666;
+  padding: 10px 0;
+}
+.selected-classrooms {
+  margin-top: 10px;
+  font-weight: bold;
+}
+.classroom-option {
+  margin-bottom: 5px;
+  padding: 5px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+</style> 

@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   mysql:
-    image: mysql:latest
+    image: mysql:8.0
     container_name: tam-mysql
     restart: always
     ports:
@@ -11,8 +11,13 @@ services:
       MYSQL_ROOT_PASSWORD: cs319Team1.#
       MYSQL_DATABASE: ta_management
     volumes:
+      - ./db_init:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
-      - ./db_init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pcs319Team1.#"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   backend:
     build:
@@ -21,13 +26,17 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: root
       DB_PASSWORD: cs319Team1.#
       DB_NAME: ta_management
+    volumes:
+      - ./src/backend:/usr/src/app
+      - /usr/src/app/node_modules
     restart: always
 
   adminer:
@@ -36,6 +45,8 @@ services:
     restart: always
     ports:
       - "8080:8080"
+    depends_on:
+      - mysql
 
 volumes:
   mysql_data:

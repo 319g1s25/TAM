@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { TAService } from '../../services/ta.service';
 import { ExamService } from '../../services/exam.service';
 import { CourseService } from '../../services/course.service';
 import { ProctoringAssignmentService } from '../../services/proctoring-assignment.service';
+import { AuthService } from '../../services/auth.service';
 import { IconComponent } from '../shared/icon.component';
 import { Exam } from '../../shared/models/exam.model';
 import { Course } from '../../shared/models/course.model';
@@ -13,7 +15,7 @@ import { TA } from '../../shared/models/ta.model';
 @Component({
   selector: 'app-proctoring-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterModule, IconComponent],
+  imports: [CommonModule, RouterLink, RouterModule, IconComponent, FormsModule],
   templateUrl: './proctoring-list.component.html',
   styleUrl: './proctoring-list.component.css'
 })
@@ -28,20 +30,32 @@ export class ProctoringListComponent implements OnInit {
   searchTerm = '';
   departmentFilter = '';
   dateFilter = '';
+  
+  // Permission flag
+  canManageProctors = false;
 
   constructor(
     private examService: ExamService,
     private courseService: CourseService,
     private taService: TAService,
     private proctoringAssignmentService: ProctoringAssignmentService,
+    private authService: AuthService,
     private router: Router
   ) {}
 
   ngOnInit() {
     console.log('ProctoringListComponent initialized');
+    // Check user permissions
+    this.checkPermissions();
+    
     this.loadCourses();
     this.loadTAs();
     this.loadExams();
+  }
+  
+  checkPermissions(): void {
+    const allowedRoles = ['authstaff', 'deansoffice', 'departmentchair', 'instructor'];
+    this.canManageProctors = this.authService.hasRole(allowedRoles);
   }
 
   private loadExams() {
@@ -74,11 +88,9 @@ export class ProctoringListComponent implements OnInit {
   }
 
   private loadTAs() {
-    console.log('Loading TAs...');
     this.taService.getAllTAs().subscribe({
       next: (tas: TA[]) => {
-        console.log('TAs loaded:', tas);
-        this.tas = tas;
+        this.tas = tas.filter(ta => !ta.isOnLeave && ta.proctoringEnabled);
       },
       error: (error: any) => {
         console.error('Error loading TAs:', error);
@@ -137,12 +149,8 @@ export class ProctoringListComponent implements OnInit {
     return Math.max(0, totalRequired - totalAssigned);
   }
 
-  onSearch(event: Event) {
-    const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
-    this.filteredExams = this.exams.filter(exam => 
-      this.getCourseName(exam.courseID).toLowerCase().includes(searchTerm) ||
-      this.getCourseCode(exam.courseID).toLowerCase().includes(searchTerm)
-    );
+  onSearch(event: Event): void {
+    this.applyFilters();
   }
 
   filterByDepartment(event: Event) {
@@ -171,12 +179,50 @@ export class ProctoringListComponent implements OnInit {
     }
   }
 
-  assignProctors(examId: number) {
-    this.router.navigate(['/proctoring/assign', examId]);
+  applyFilters(): void {
+    this.filteredExams = this.exams.filter(exam => {
+      const course = this.courses.find(c => c.id === exam.courseID);
+      
+      // Search term filter
+      if (this.searchTerm) {
+        const searchVal = this.searchTerm.toLowerCase();
+        const courseMatches = course && (
+          course.name.toLowerCase().includes(searchVal) || 
+          course.course_code.toLowerCase().includes(searchVal)
+        );
+        
+        if (!courseMatches) {
+          return false;
+        }
+      }
+      
+      // Department filter
+      if (this.departmentFilter && course) {
+        if (!course.department.toLowerCase().includes(this.departmentFilter.toLowerCase())) {
+          return false;
+        }
+      }
+      
+      // Date filter
+      if (this.dateFilter) {
+        const examDate = new Date(exam.date).toISOString().substring(0, 10);
+        if (examDate !== this.dateFilter) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
   }
 
   createNewExam(): void {
     this.router.navigate(['/proctoring/new']);
+  }
+
+  assignProctors(examId: number) {
+    if (this.canManageProctors) {
+      this.router.navigate(['/proctoring/assign', examId]);
+    }
   }
 }
 
