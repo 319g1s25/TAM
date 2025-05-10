@@ -105,14 +105,40 @@ exports.getInstructorWorkloads = async (req, res) => {
 };
 
 exports.approveWorkloadEntry = async (req, res) => {
-  const { id } = req.params;
+  let { id } = req.params;
   const { approved } = req.body; // approved: true or false
 
   try {
-    await db.query(
+    // Ensure id is treated as an integer
+    id = parseInt(id, 10);
+    console.log(`Approving workload entry with ID: ${id} (type: ${typeof id}), Approved: ${approved}`);
+
+    // Update the task's approval status
+    const updateTaskResult = await db.query(
       `UPDATE task SET approved = ? WHERE id = ?`,
       [approved, id]
     );
+    console.log('Task approval update result:', updateTaskResult);
+
+    // Fetch the task details to update the TA's total workload
+    const task = await db.query(
+      `SELECT taID, hoursspent FROM task WHERE id = ?`,
+      [id]
+    );
+    console.log('Fetched task details:', task);
+
+    if (task.length > 0) {
+      const { taID, hoursspent } = task[0];
+
+      const updateWorkloadResult = await db.query(
+        `UPDATE ta SET totalWorkload = totalWorkload + ? WHERE id = ?`,
+        [hoursspent, taID]
+      );
+      console.log('TA total workload update result:', updateWorkloadResult);
+    } else {
+      console.warn(`No task found with the given ID: ${id}`);
+      return res.status(404).json({ success: false, message: 'Task not found' });
+    }
 
     res.json({ success: true });
   } catch (error) {
