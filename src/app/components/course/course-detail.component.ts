@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Course } from '../../shared/models/course.model';
 import { CourseService } from '../../services/course.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-course-detail',
@@ -15,20 +16,30 @@ export class CourseDetailComponent implements OnInit {
   course: Course | null = null;
   isLoading = true;
   error: string | null = null;
+  currentUserRole: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private courseService: CourseService
+    private courseService: CourseService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    this.getCurrentUserRole();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadCourse(Number(id));
     } else {
       this.error = 'Course ID not provided';
       this.isLoading = false;
+    }
+  }
+
+  getCurrentUserRole(): void {
+    const currentUser = this.authService.currentUserValue;
+    if (currentUser && currentUser.role) {
+      this.currentUserRole = currentUser.role;
     }
   }
 

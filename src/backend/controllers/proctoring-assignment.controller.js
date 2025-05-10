@@ -103,3 +103,80 @@ exports.autoAssignProctors = async (req, res) => {
       res.status(500).json({ error: 'Database error' });
     }
   };
+
+// GET: Get upcoming proctoring assignments for a specific TA
+exports.getTAProctorings = async (req, res) => {
+  const { taId } = req.params;
+  const { period } = req.query; // 'week' or 'month'
+  
+  console.log(`Fetching proctorings for TA ${taId}, period: ${period || 'all'}`);
+  
+  if (!taId) {
+    return res.status(400).json({ 
+      success: false, 
+      error: 'Missing required taId parameter' 
+    });
+  }
+  
+  try {
+    let dateFilter = '';
+    const now = new Date();
+    
+    if (period === 'week') {
+      // Filter for the next 7 days
+      const nextWeek = new Date(now);
+      nextWeek.setDate(nextWeek.getDate() + 7);
+      dateFilter = `AND e.date BETWEEN NOW() AND '${nextWeek.toISOString().split('T')[0]}'`;
+    } else if (period === 'month') {
+      // Filter for the next 30 days
+      const nextMonth = new Date(now);
+      nextMonth.setDate(nextMonth.getDate() + 30);
+      dateFilter = `AND e.date BETWEEN NOW() AND '${nextMonth.toISOString().split('T')[0]}'`;
+    } else {
+      // Default: all upcoming
+      dateFilter = 'AND e.date >= NOW()';
+    }
+
+    // Check if TA exists first
+    console.log(`Checking if TA ${taId} exists`);
+    const taExists = await db.query('SELECT id FROM ta WHERE id = ?', [taId]);
+    console.log('TA query result:', taExists);
+    
+    if (!taExists || taExists.length === 0) {
+      console.log(`TA with ID ${taId} does not exist`);
+      return res.status(404).json({
+        success: false, 
+        error: 'TA not found'
+      });
+    }
+
+    console.log(`Executing query with filter: ${dateFilter}`);
+    const query = `SELECT pa.id, pa.taID, pa.examID, pa.status,
+              e.date, e.duration, e.proctorsRequired,
+              c.id as courseId, c.course_code, c.name as courseName
+       FROM proctoringassignment pa
+       JOIN exam e ON pa.examID = e.id
+       JOIN course c ON e.courseID = c.id
+       WHERE pa.taID = ? ${dateFilter}
+       ORDER BY e.date ASC`;
+       
+    console.log('SQL Query:', query);
+    console.log('Query parameters:', [taId]);
+    
+    const assignments = await db.query(query, [taId]);
+    
+    console.log(`Found ${assignments.length} assignments for TA ${taId}:`, assignments);
+    
+    // If no assignments are found, still return success but with empty array
+    res.json({
+      success: true,
+      assignments: assignments || []
+    });
+  } catch (err) {
+    console.error('Error in getTAProctorings:', err);
+    res.status(500).json({ 
+      success: false,
+      error: 'Database error: ' + err.message
+    });
+  }
+};

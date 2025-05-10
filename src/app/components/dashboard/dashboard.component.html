@@ -4,6 +4,9 @@
     <p class="subtitle">{{ welcomeMessage }}</p>
   </header>
   
+  <!-- TA Proctoring Calendar -->
+  <app-ta-proctoring-calendar *ngIf="currentUser?.role === 'ta'"></app-ta-proctoring-calendar>
+  
   <div class="dashboard-overview">
     <div class="overview-cards">
       <div class="stat-card">
@@ -28,16 +31,6 @@
           <h3>Courses</h3>
           <p class="stat-value">{{ stats.courseCount }}</p>
           <p class="stat-context">{{ stats.activeCourseCount }} active this semester</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">
-          <app-icon icon="assignment" size="large"></app-icon>
-        </div>
-        <div class="stat-content">
-          <h3>Assignments</h3>
-          <p class="stat-value">{{ stats.assignmentCount }}</p>
-          <p class="stat-context">{{ stats.pendingAssignmentCount }} pending</p>
         </div>
       </div>
       <div class="stat-card">
@@ -99,7 +92,7 @@
       </div>
     </div>
     
-    <div class="card">
+    <div class="card" *ngIf="currentUser?.role !== 'instructor'">
       <div class="card-header">
         <h2>Workload Management</h2>
         <span class="card-badge" *ngIf="currentUser?.role === 'instructor'">{{ stats.pendingWorkloadCount }}</span>
@@ -111,15 +104,14 @@
       </div>
     </div>
     
-    <div class="card">
+    <div class="card" *ngIf="currentUser?.role === 'instructor'">
       <div class="card-header">
-        <h2>Assignment Planning</h2>
-        <span class="card-badge">{{ stats.assignmentCount }}</span>
+        <h2>Workload Review</h2>
+        <span class="card-badge">{{ stats.pendingWorkloadCount }}</span>
       </div>
-      <p>Create and manage TA assignments to courses</p>
+      <p>Review and approve TA workload submissions</p>
       <div class="card-actions">
-        <a routerLink="/assignments" class="btn btn-primary">View Assignments</a>
-        <a *ngIf="canManageAssignments()" routerLink="/assignments/add" class="btn btn-outline">Add New</a>
+        <a routerLink="/workload/instructor" class="btn btn-primary">Review Entries</a>
       </div>
     </div>
     

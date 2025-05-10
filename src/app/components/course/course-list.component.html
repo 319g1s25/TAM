@@ -1,7 +1,7 @@
 <div class="content-container">
     <header class="content-header">
       <h1>Course Management</h1>
-      <button class="btn btn-accent" routerLink="/courses/new">
+      <button class="btn btn-accent" routerLink="/courses/new" *ngIf="currentUserRole !== 'ta'">
         <app-icon icon="add"></app-icon>
         Add New Course
       </button>
@@ -74,10 +74,10 @@
             <button class="btn btn-sm" [routerLink]="['/courses', course.id]" title="View">
               <app-icon icon="view" size="small"></app-icon>
             </button>
-            <button class="btn btn-sm btn-accent" [routerLink]="['/courses', course.id, 'edit']" title="Edit">
+            <button class="btn btn-sm btn-accent" [routerLink]="['/courses', course.id, 'edit']" title="Edit" *ngIf="currentUserRole !== 'ta'">
               <app-icon icon="edit" size="small"></app-icon>
             </button>
-            <button class="btn btn-sm btn-danger" (click)="course.id !== undefined && deleteCourse(course.id)" title="Delete">
+            <button class="btn btn-sm btn-danger" (click)="course.id !== undefined && deleteCourse(course.id)" title="Delete" *ngIf="currentUserRole !== 'ta'">
               <app-icon icon="delete" size="small"></app-icon>
             </button>
           </div>

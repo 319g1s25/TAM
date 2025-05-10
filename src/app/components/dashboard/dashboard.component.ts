@@ -7,11 +7,17 @@ import { AuthService } from '../../services/auth.service';
 import { DashboardService, DashboardStats } from '../../services/dashboard.service';
 //import {  UrgentTask } from '../../services/dashboard.service';
 import { Subscription } from 'rxjs';
+import { TaProctoringCalendarComponent } from './ta-proctoring-calendar/ta-proctoring-calendar.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, IconComponent],
+  imports: [
+    CommonModule, 
+    RouterModule, 
+    IconComponent,
+    TaProctoringCalendarComponent
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })

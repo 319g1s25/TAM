@@ -7,6 +7,7 @@ import { IconComponent } from '../shared/icon.component';
 import { TAService } from '../../services/ta.service';
 import { TA } from '../../shared/models/ta.model';
 import { TAAssignmentService } from '../../services/ta-assignment.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-course-list',
@@ -19,16 +20,26 @@ export class CourseListComponent implements OnInit {
   courses: Course[] = [];
   filteredCourses: Course[] = [];
   tas: TA[] = [];
+  currentUserRole: string = '';
   
   constructor(
     private courseService: CourseService,
     private taService: TAService,
-    private taAssignmentService: TAAssignmentService
+    private taAssignmentService: TAAssignmentService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.loadCourses();
     //this.loadTAs();
+    this.getCurrentUserRole();
+  }
+
+  getCurrentUserRole(): void {
+    const currentUser = this.authService.currentUserValue;
+    if (currentUser && currentUser.role) {
+      this.currentUserRole = currentUser.role;
+    }
   }
 
   loadCourses(): void {

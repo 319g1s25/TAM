@@ -4,68 +4,131 @@
   margin: 0 auto;
 }
 
-.header {
+/* Header styling */
+.dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
 }
 
-.header h1 {
-  margin: 0;
+.header-title h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
   color: var(--text-color);
 }
 
-.stats-container {
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+/* Statistics cards */
+.stat-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
 .stat-card {
-  background-color: var(--surface-color);
+  display: flex;
+  align-items: flex-start;
+  background: var(--card-bg);
+  border-radius: 10px;
   padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.stat-card h3 {
-  margin: 0 0 0.5rem 0;
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  margin-right: 1rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.exam-icon {
+  background: linear-gradient(135deg, #3f51b5, #7986cb);
+}
+
+.proctor-icon {
+  background: linear-gradient(135deg, #009688, #4db6ac);
+}
+
+.shortage-icon {
+  background: linear-gradient(135deg, #f44336, #ef5350);
+}
+
+.stat-content h3 {
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  font-size: 1rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 500;
 }
 
 .stat-value {
-  margin: 0;
   font-size: 2rem;
   font-weight: 600;
   color: var(--text-color);
+  margin: 0 0 0.25rem 0;
 }
 
-.filters {
+.stat-context {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.warning-card {
+  border-left: 4px solid #f44336;
+}
+
+/* Search and filters */
+.controls-section {
   display: flex;
-  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
   flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.search-box {
+.search-bar {
+  position: relative;
   flex: 1;
   min-width: 300px;
-  position: relative;
 }
 
-.search-box input {
+.search-bar input {
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
   background-color: var(--input-bg);
   color: var(--text-color);
+  font-size: 1rem;
+  transition: all 0.2s;
 }
 
-.search-box app-icon {
+.search-bar input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+}
+
+.search-icon {
   position: absolute;
   left: 0.75rem;
   top: 50%;
@@ -73,31 +136,45 @@
   color: var(--text-secondary);
 }
 
-.filter-group {
+.filter-options {
   display: flex;
   gap: 1rem;
 }
 
-.filter-group select {
+.filter-select {
   padding: 0.75rem 1rem;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
   background-color: var(--input-bg);
   color: var(--text-color);
+  font-size: 0.95rem;
+  min-width: 180px;
+  cursor: pointer;
 }
 
-.exams-list {
+.filter-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+/* Exam cards */
+.exam-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 2rem;
 }
 
 .exam-card {
-  background-color: var(--surface-color);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: var(--card-bg);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.exam-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .exam-header {
@@ -105,85 +182,108 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background-color: var(--surface-color-dark);
+  background-color: var(--card-header-bg);
+  border-bottom: 1px solid var(--border-color);
 }
 
-.department-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 500;
+.course-code {
+  font-weight: 600;
+  color: var(--primary-color);
+  font-size: 1rem;
 }
 
 .status-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
   font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.status-badge.pending {
+.status-pending {
   background-color: var(--warning-bg);
-  color: var(--warning-color);
+  color: var(--warning-text);
 }
 
-.status-badge.assigned {
-  background-color: var(--success-bg);
-  color: var(--success-color);
-}
-
-.status-badge.completed {
+.status-assigned {
   background-color: var(--info-bg);
-  color: var(--info-color);
+  color: var(--info-text);
+}
+
+.status-completed {
+  background-color: var(--success-bg);
+  color: var(--success-text);
+}
+
+.status-past {
+  background-color: var(--secondary-bg);
+  color: var(--text-secondary);
 }
 
 .exam-content {
-  padding: 1.5rem;
+  padding: 1.25rem;
 }
 
-.exam-content h3 {
+.course-name {
   margin: 0 0 1rem 0;
+  font-size: 1.25rem;
   color: var(--text-color);
+  line-height: 1.4;
 }
 
-.exam-content p {
+.exam-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detail-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin: 0.5rem 0;
+  gap: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.detail-row svg {
+  flex-shrink: 0;
   color: var(--text-secondary);
 }
 
-.exam-content app-icon {
-  color: var(--text-secondary);
+.shortage {
+  color: var(--error-color);
+  font-weight: 500;
 }
 
 .exam-actions {
-  padding: 1rem;
-  border-top: 1px solid var(--border-color);
   display: flex;
   gap: 0.75rem;
   justify-content: flex-end;
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--card-footer-bg);
 }
 
-.auto-assign {
-  display: flex;
-  justify-content: center;
-  margin-top: 2rem;
-}
-
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1.25rem;
   border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
   text-decoration: none;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-primary {
@@ -191,8 +291,8 @@
   color: white;
 }
 
-.btn-primary:hover {
-  background-color: var(--primary-color-dark);
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-dark);
 }
 
 .btn-secondary {
@@ -201,26 +301,69 @@
 }
 
 .btn-secondary:hover {
-  background-color: var(--secondary-color-dark);
+  background-color: var(--secondary-dark);
 }
 
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.create-button {
+  white-space: nowrap;
 }
 
-/* Department badge colors */
-.dept-cs {
-  background-color: var(--cs-bg);
-  color: var(--cs-color);
+.icon {
+  width: 20px;
+  height: 20px;
 }
 
-.dept-ma {
-  background-color: var(--ma-bg);
-  color: var(--ma-color);
+/* No exams state */
+.no-exams {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  color: var(--text-secondary);
+  text-align: center;
+  gap: 1rem;
 }
 
-.dept-ph {
-  background-color: var(--ph-bg);
-  color: var(--ph-color);
+.no-exams p {
+  font-size: 1.1rem;
+  margin: 1rem 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .proctoring-container {
+    padding: 1rem;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .controls-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-bar {
+    width: 100%;
+  }
+  
+  .filter-options {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .filter-select {
+    flex: 1;
+  }
+  
+  .exam-grid {
+    grid-template-columns: 1fr;
+  }
 }

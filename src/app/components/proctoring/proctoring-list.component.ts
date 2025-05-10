@@ -7,7 +7,6 @@ import { ExamService } from '../../services/exam.service';
 import { CourseService } from '../../services/course.service';
 import { ProctoringAssignmentService } from '../../services/proctoring-assignment.service';
 import { AuthService } from '../../services/auth.service';
-import { IconComponent } from '../shared/icon.component';
 import { Exam } from '../../shared/models/exam.model';
 import { Course } from '../../shared/models/course.model';
 import { TA } from '../../shared/models/ta.model';
@@ -15,7 +14,7 @@ import { TA } from '../../shared/models/ta.model';
 @Component({
   selector: 'app-proctoring-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterModule, IconComponent, FormsModule],
+  imports: [CommonModule, RouterLink, RouterModule, FormsModule],
   templateUrl: './proctoring-list.component.html',
   styleUrl: './proctoring-list.component.css'
 })
@@ -223,6 +222,67 @@ export class ProctoringListComponent implements OnInit {
     if (this.canManageProctors) {
       this.router.navigate(['/proctoring/assign', examId]);
     }
+  }
+
+  filterExams(event: Event): void {
+    const filterValue = (event.target as HTMLSelectElement).value;
+    const now = new Date();
+    
+    switch (filterValue) {
+      case 'upcoming':
+        this.filteredExams = this.exams.filter(exam => new Date(exam.date) > now);
+        break;
+      case 'completed':
+        this.filteredExams = this.exams.filter(exam => new Date(exam.date) < now);
+        break;
+      case 'needs-proctors':
+        this.filteredExams = this.exams.filter(exam => {
+          const assigned = this.assignedCounts[exam.id] || 0;
+          return assigned < exam.proctorsRequired && new Date(exam.date) > now;
+        });
+        break;
+      default: // 'all'
+        this.filteredExams = [...this.exams];
+        break;
+    }
+  }
+
+  getExamStatusClass(exam: Exam): string {
+    const examDate = new Date(exam.date);
+    const now = new Date();
+    
+    if (examDate < now) {
+      return 'status-completed';
+    }
+    
+    const assignedProctors = this.assignedCounts[exam.id] || 0;
+    if (assignedProctors >= exam.proctorsRequired) {
+      return 'status-assigned';
+    }
+    
+    return 'status-pending';
+  }
+
+  getExamStatus(exam: Exam): string {
+    const examDate = new Date(exam.date);
+    const now = new Date();
+    
+    if (examDate < now) {
+      return 'Completed';
+    }
+    
+    const assignedProctors = this.assignedCounts[exam.id] || 0;
+    if (assignedProctors >= exam.proctorsRequired) {
+      return 'Proctors Assigned';
+    }
+    
+    return 'Needs Proctors';
+  }
+
+  isPast(dateString: string): boolean {
+    const date = new Date(dateString);
+    const today = new Date();
+    return date < today;
   }
 }
 

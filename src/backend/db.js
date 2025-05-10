@@ -1,12 +1,12 @@
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
-// Set default credentials for development (Docker setup)
-const DB_HOST = 'mysql';  // Using Docker container name
-const DB_USER = 'root';
-const DB_PASSWORD = 'cs319Team1.#';
-const DB_NAME = 'ta_management';
-const DB_PORT = 3306;
+// Set default credentials for development
+const DB_HOST = process.env.DB_HOST || 'tam-mysql';  // Use Docker container name
+const DB_USER = process.env.DB_USER || 'root';
+const DB_PASSWORD = process.env.DB_PASSWORD || 'cs319Team1.#';
+const DB_NAME = process.env.DB_NAME || 'ta_management';
+const DB_PORT = process.env.DB_PORT || 3306;  // Using internal Docker port
 
 console.log('DB Connection Values:', {
   host: DB_HOST,

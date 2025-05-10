@@ -1,0 +1,79 @@
+<div class="proctoring-calendar">
+  <div class="calendar-header">
+    <h2>Upcoming Proctoring Assignments</h2>
+    <div class="calendar-controls">
+      <select [(ngModel)]="selectedPeriod" (change)="onPeriodChange()" class="period-select">
+        <option value="all">All Upcoming</option>
+        <option value="week">This Week</option>
+        <option value="month">This Month</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading proctoring assignments...</p>
+  </div>
+
+  <div class="error-message" *ngIf="!loading && error">
+    <p>{{ error }}</p>
+  </div>
+
+  <div class="calendar-container" *ngIf="!loading && !error">
+    <div class="no-events" *ngIf="proctoringEvents.length === 0">
+      <svg viewBox="0 0 24 24" width="48" height="48">
+        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" fill="currentColor"/>
+      </svg>
+      <p>No proctoring assignments found for the selected period. Check back later or contact your coordinator.</p>
+    </div>
+
+    <!-- Calendar View -->
+    <div class="calendar-view" *ngIf="proctoringEvents.length > 0">
+      <div class="calendar-month-header">
+        <h3>{{ currentMonth }}</h3>
+      </div>
+      
+      <div class="calendar-grid">
+        <div class="day-header" *ngFor="let day of daysOfWeek">{{ day }}</div>
+        <div *ngFor="let day of calendarDays" class="calendar-day" [class.has-events]="day.hasEvents" [class.other-month]="!day.isCurrentMonth">
+          <div class="day-number">{{ day.dayNumber }}</div>
+          <div *ngIf="day.hasEvents" class="day-events">
+            <div *ngFor="let event of day.events" class="calendar-event" [ngClass]="getStatusClass(event.status)">
+              <div class="event-time">{{ formatEventTime(event.date) }}</div>
+              <div class="event-title">{{ event.course_code }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- List View of all events -->
+    <div class="events-list" *ngIf="proctoringEvents.length > 0">
+      <h3 class="list-header">Detailed Schedule</h3>
+      <div class="event-card" *ngFor="let event of proctoringEvents">
+        <div class="event-date">
+          <div class="date-badge">
+            <span class="month">{{ formatDate(event.date).split(' ')[1] }}</span>
+            <span class="day">{{ formatDate(event.date).split(' ')[2] }}</span>
+            <span class="time">{{ formatDate(event.date).split(' ')[3] }}</span>
+          </div>
+        </div>
+        <div class="event-details">
+          <h3 class="course-code">{{ event.course_code }}</h3>
+          <p class="course-name">{{ event.courseName }}</p>
+          <div class="event-meta">
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24" width="16" height="16">
+                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" fill="currentColor"/>
+              </svg>
+              <span>{{ formatDuration(event.duration) }}</span>
+            </div>
+            <div class="meta-item status" [ngClass]="getStatusClass(event.status)">
+              {{ event.status || 'Assigned' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
