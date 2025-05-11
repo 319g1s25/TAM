@@ -1,13 +1,13 @@
-/*const nodemailer = require('nodemailer');
+// NOTE: Real email functionality has been disabled to prevent login issues
+// const nodemailer = require('nodemailer');
 
-// Create a transporter using Gmail credentials
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'donotreplytam@gmail.com',
-    pass: 'T10/05/2025s'
+// Mock transporter that just logs instead of sending emails
+const transporter = {
+  sendMail: (mailOptions) => {
+    console.log('Email sending disabled, would have sent:', mailOptions);
+    return Promise.resolve({ messageId: 'mock-message-id-' + Date.now() });
   }
-});*/
+};
 
 /**
  * Send an email notification
@@ -27,11 +27,17 @@ const sendEmail = async (to, subject, text, html) => {
       html: html || text
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully:', info.messageId);
-    return { success: true, messageId: info.messageId };
+    // Log email details instead of actually sending
+    console.log('Email sending disabled. Email details:', {
+      to,
+      subject,
+      textLength: text?.length || 0
+    });
+    
+    // Always return success since no actual sending is happening
+    return { success: true, messageId: 'mock-message-id-' + Date.now() };
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Mock email error:', error);
     return { success: false, error: error.message };
   }
 };

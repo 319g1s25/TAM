@@ -17,6 +17,7 @@ import { LeaveRequestListComponent } from './components/leave-request/leave-requ
 import { LeaveRequestFormComponent } from './components/leave-request/leave-request-form.component';
 import { ProctoringListComponent } from './components/proctoring/proctoring-list.component';
 import { ExamFormComponent } from './components/proctoring/exam-form.component';
+import { ManualAssignmentComponent } from './components/ta-assignment/manual-assignment.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -53,6 +54,8 @@ export const routes: Routes = [
   { path: 'proctoring/new', component: ExamFormComponent, canActivate: [RoleGuard], data: { roles: ['authstaff', 'deansoffice', 'departmentchair', 'instructor'] } },
   { path: 'proctoring/:id', loadComponent: () => import('./components/proctoring/exam-details.component').then(c => c.ExamDetailsComponent), canActivate: [RoleGuard], data: { roles: ['authstaff', 'deansoffice', 'departmentchair', 'instructor', 'ta'] } },
   { path: 'proctoring/assign/:id', loadComponent: () => import('./components/proctoring/proctor-assignment.component').then(c => c.ProctorAssignmentComponent), canActivate: [RoleGuard], data: { roles: ['authstaff', 'deansoffice', 'departmentchair', 'instructor'] } },
+
+  { path: 'ta-assignments', component: ManualAssignmentComponent, canActivate: [RoleGuard], data: { roles: ['authstaff', 'deansoffice', 'departmentchair', 'instructor'] } },
 
   { path: '**', redirectTo: '/dashboard' }
 ];
