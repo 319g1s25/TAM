@@ -15,6 +15,9 @@ const classroomRoutes = require('./routes/classroom.router');
 const proctoringRoutes = require('./routes/proctoring-assignment.router');
 const leaveRequestRoutes = require('./routes/leave-request.router');
 const notificationRoutes = require('./routes/notification.router');
+const instructorRoutes = require('./routes/instructor.router');
+const deansOfficeRoutes = require('./routes/deansoffice.router');
+const departmentChairRoutes = require('./routes/departmentchair.router');
 
 console.log('Starting server...');
 console.log('Loaded routes:');
@@ -51,6 +54,9 @@ app.use('/api/classrooms', classroomRoutes);
 app.use('/api/proctoring-assignments', proctoringRoutes);
 app.use('/api/leave-requests', leaveRequestRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/instructors', instructorRoutes);
+app.use('/api/deansoffice', deansOfficeRoutes);
+app.use('/api/departmentchairs', departmentChairRoutes);
 
 // Start the server
 async function startServer() {

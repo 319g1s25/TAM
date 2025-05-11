@@ -120,7 +120,13 @@ export class ProctoringListComponent implements OnInit {
 
   private loadCourses() {
     console.log('Loading courses...');
-    this.courseService.getAllCourses().subscribe({
+    const currentUser = this.authService.currentUserValue;
+    if (!currentUser) {
+      console.error('No current user found');
+      return;
+    }
+
+    this.courseService.getCoursesByRole(currentUser.role, currentUser.id).subscribe({
       next: (courses: Course[]) => {
         console.log('Courses loaded:', courses);
         this.courses = courses;

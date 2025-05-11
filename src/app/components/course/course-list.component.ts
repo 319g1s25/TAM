@@ -43,7 +43,13 @@ export class CourseListComponent implements OnInit {
   }
 
   loadCourses(): void {
-    this.courseService.getAllCourses().subscribe(
+    const currentUser = this.authService.currentUserValue;
+    if (!currentUser) {
+      console.error('No current user found');
+      return;
+    }
+
+    this.courseService.getCoursesByRole(currentUser.role, currentUser.id).subscribe(
       courses => {
         this.courses = courses;
         this.filteredCourses = courses;

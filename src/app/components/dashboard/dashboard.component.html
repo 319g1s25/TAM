@@ -47,28 +47,6 @@
   </div>
 
   <div class="dashboard-grid">
-    <div class="card">
-      <div class="card-header">
-        <h2>TA Management</h2>
-      </div>
-      <p>Manage teaching assistants and their assignments</p>
-      <div class="card-actions">
-        <a routerLink="/tas" class="btn btn-primary">View TAs</a>
-        <a *ngIf="hasAdminRights()" routerLink="/tas/new" class="btn btn-outline">Add New</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <h2>Course Management</h2>
-      </div>
-      <p>Add, edit or remove courses and their details</p>
-      <div class="card-actions">
-        <a routerLink="/courses" class="btn btn-primary">View Courses</a>
-        <a *ngIf="hasAdminRights()" routerLink="/courses/new" class="btn btn-outline">Add New</a>
-      </div>
-    </div>
-
     <div class="card" *ngIf="currentUser?.role === 'ta'">
       <div class="card-header">
         <h2>Workload Management</h2>
@@ -124,6 +102,78 @@
       <div class="card-actions">
         <a routerLink="/leave-requests" class="btn btn-primary">View Requests</a>
         <a routerLink="/leave-requests/new" class="btn btn-outline" *ngIf="authService.isTA">Request Leave</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Management Section -->
+  <div class="management-section" *ngIf="isAdminView">
+    <h2 class="section-title">System Management</h2>
+    <div class="management-grid">
+      <!-- TA Management Card -->
+      <div class="card" *ngIf="currentUser?.role === 'authstaff'">
+        <div class="card-header">
+          <h3>TA Management</h3>
+        </div>
+        <p>Manage teaching assistants and their assignments</p>
+        <div class="card-actions">
+          <a routerLink="/tas" class="btn btn-primary">Manage TAs</a>
+        </div>
+      </div>
+
+      <!-- Course Management Card -->
+      <div class="card" *ngIf="currentUser?.role === 'authstaff'">
+        <div class="card-header">
+          <h3>Course Management</h3>
+        </div>
+        <p>Add, edit or remove courses and their details</p>
+        <div class="card-actions">
+          <a routerLink="/courses" class="btn btn-primary">Manage Courses</a>
+        </div>
+      </div>
+
+      <!-- Instructor Management Card -->
+      <div class="card" *ngIf="currentUser?.role === 'authstaff'">
+        <div class="card-header">
+          <h3>Instructor Management</h3>
+        </div>
+        <p>Manage instructor accounts and information</p>
+        <div class="card-actions">
+          <a routerLink="/instructors" class="btn btn-primary">Manage Instructors</a>
+        </div>
+      </div>
+
+      <!-- Deans Office Management Card -->
+      <div class="card" *ngIf="currentUser?.role === 'authstaff'">
+        <div class="card-header">
+          <h3>Deans Office Management</h3>
+        </div>
+        <p>Manage deans office staff accounts</p>
+        <div class="card-actions">
+          <a routerLink="/deansoffice" class="btn btn-primary">Manage Staff</a>
+        </div>
+      </div>
+
+      <!-- Department Chair Management Card -->
+      <div class="card" *ngIf="currentUser?.role === 'authstaff'">
+        <div class="card-header">
+          <h3>Department Chair Management</h3>
+        </div>
+        <p>Manage department chair accounts</p>
+        <div class="card-actions">
+          <a routerLink="/departmentchairs" class="btn btn-primary">Manage Chairs</a>
+        </div>
+      </div>
+
+      <!-- Classroom Management Card -->
+      <div class="card" *ngIf="currentUser?.role === 'authstaff'">
+        <div class="card-header">
+          <h3>Classroom Management</h3>
+        </div>
+        <p>Manage classroom information and capacity</p>
+        <div class="card-actions">
+          <a routerLink="/classrooms" class="btn btn-primary">Manage Classrooms</a>
+        </div>
       </div>
     </div>
   </div>
