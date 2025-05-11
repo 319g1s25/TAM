@@ -39,9 +39,9 @@
               <tbody>
                 <tr *ngFor="let entry of workloadEntries">
                   <td data-label="Date">{{ entry.date | date:'mediumDate' }}</td>
-                  <td data-label="Course">{{ entry.courseID }}</td>
-                  <td data-label="Task Type">{{ entry.tasktype }}</td>
-                  <td data-label="Hours">{{ entry.hoursspent }}</td>
+                  <td data-label="Course">{{ entry.course_id }}</td>
+                  <td data-label="Task Type">{{ entry.description }}</td>
+                  <td data-label="Hours">{{ entry.hours }}</td>
                   <td data-label="Description">{{ entry.description }}</td>
                   <td data-label="Status">
                     <span [class]="getStatusClass(entry.approved)">

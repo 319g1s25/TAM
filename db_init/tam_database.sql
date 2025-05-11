@@ -466,14 +466,14 @@ CREATE TABLE `ta` (
 LOCK TABLES `ta` WRITE;
 /*!40000 ALTER TABLE `ta` DISABLE KEYS */;
 INSERT INTO `ta` VALUES
-(1, 'Ahmet', 'Yılmaz', 'ahmet@bilkent.edu.tr', 'ahmet1234', 1, 20, 'MSc', 1, 'Computer Science'),
+(1, 'Ahmet', 'Yılmaz', 'ahmet@bilkent.edu.tr', 'ahmet1234', 1, 20, 'MS', 1, 'Computer Science'),
 (2, 'Elif', 'Kara', 'elif@bilkent.edu.tr', 'elif1234', 0, 15, 'PhD', 1, 'Endustrial Engineering'),
 (3, 'Mehmet', 'Öztürk', 'mehmet@bilkent.edu.tr', 'mehmet1234', 1, 25, 'PhD', 0, 'Computer Science'),
 (4, 'Nazlı', 'Çevik', 'nazli@bilkent.edu.tr', 'nazli1234', 0, 25, 'PhD', 1, 'Computer Science'),
-(5, 'Zeynep', 'Demir', 'zeynep@bilkent.edu.tr', 'zeynep1234', 0, 18, 'MSc', 0, 'Computer Science'),
-(6, 'Burak', 'Aslan', 'burak@bilkent.edu.tr', 'burak1234', 1, 20, 'MSc', 1, 'Industrial Engineering'),
+(5, 'Zeynep', 'Demir', 'zeynep@bilkent.edu.tr', 'zeynep1234', 0, 18, 'MS', 0, 'Computer Science'),
+(6, 'Burak', 'Aslan', 'burak@bilkent.edu.tr', 'burak1234', 1, 20, 'MS', 1, 'Industrial Engineering'),
 (7, 'Ece', 'Aydın', 'ece@bilkent.edu.tr', 'ece1234', 0, 22, 'PhD', 1, 'Industrial Engineering'),
-(8, 'Mert', 'Çelik', 'mert@bilkent.edu.tr', 'mert1234', 1, 30, 'MSc', 0, 'Computer Science');
+(8, 'Mert', 'Çelik', 'mert@bilkent.edu.tr', 'mert1234', 1, 30, 'MS', 0, 'Computer Science');
 /*!40000 ALTER TABLE `ta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -563,6 +563,77 @@ LOCK TABLES `user` WRITE;
 INSERT INTO `user` VALUES (1,'Nikki','Lauda',NULL,NULL);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `assignments`
+--
+
+DROP TABLE IF EXISTS `assignments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `assignments` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `course_id` int NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` text,
+  `due_date` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_assignments_course_id` (`course_id`),
+  CONSTRAINT `fk_assignments_course_id` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `assignments`
+--
+
+LOCK TABLES `assignments` WRITE;
+/*!40000 ALTER TABLE `assignments` DISABLE KEYS */;
+INSERT INTO `assignments` VALUES 
+(1, 12, 'Assignment 1', 'Basic programming concepts', '2024-04-15'),
+(2, 12, 'Assignment 2', 'Arrays and loops', '2024-04-22'),
+(3, 13, 'Assignment 1', 'Object-oriented programming', '2024-04-16'),
+(4, 14, 'Assignment 1', 'Linked lists', '2024-04-17');
+/*!40000 ALTER TABLE `assignments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `workload`
+--
+
+DROP TABLE IF EXISTS `workload`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE IF NOT EXISTS `workload` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `ta_id` int NOT NULL,
+  `course_id` int NOT NULL,
+  `date` date NOT NULL,
+  `hours` int NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `approved` boolean DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_ta_id_workload` (`ta_id`),
+  KEY `fk_course_id_workload` (`course_id`),
+  CONSTRAINT `fk_course_id_workload` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ta_id_workload` FOREIGN KEY (`ta_id`) REFERENCES `ta` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `workload`
+--
+
+LOCK TABLES `workload` WRITE;
+/*!40000 ALTER TABLE `workload` DISABLE KEYS */;
+INSERT INTO `workload` VALUES 
+(1, 1, 12, '2024-04-11', 2.5, 'Graded assignment 1', true),
+(2, 2, 12, '2024-04-12', 3.0, 'Graded assignment 2', true),
+(3, 3, 13, '2024-04-13', 2.0, 'Graded assignment 1', true),
+(4, 4, 14, '2024-04-14', 2.5, 'Graded assignment 1', true);
+/*!40000 ALTER TABLE `workload` ENABLE KEYS */;
+UNLOCK TABLES;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

@@ -29,7 +29,7 @@ export interface InstructorWorkloadEntry extends WorkloadEntry {
   providedIn: 'root'
 })
 export class WorkloadService {
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = `${environment.apiUrl}/workload`;
   
   constructor(
     private http: HttpClient,
@@ -39,24 +39,59 @@ export class WorkloadService {
 
   // Get all workload entries
   getWorkloadEntries(): Observable<WorkloadEntry[]> {
-    return this.http.get<{ success: boolean; workload: WorkloadEntry[] }>(`${this.apiUrl}/workload`)
-      .pipe(map(response => response.workload));
+    return this.http.get<any>(this.apiUrl).pipe(
+      map(response => {
+        console.log('Raw workload response:', response);
+        if (response && response.success && Array.isArray(response.workload)) {
+          return response.workload.map((entry: any) => ({
+            id: entry.id,
+            ta_id: entry.ta_id,
+            course_id: entry.course_id,
+            date: new Date(entry.date),
+            hours: entry.hours,
+            description: entry.description,
+            approved: entry.approved
+          }));
+        }
+        return [];
+      }),
+      catchError(error => {
+        console.error('Error fetching workload entries:', error);
+        return of([]);
+      })
+    );
   }
 
   // Get workload entries for a specific TA
   getWorkloadEntriesByTA(taId: string): Observable<WorkloadEntry[]> {
-    return this.http.get<{ success: boolean; workload: WorkloadEntry[] }>(`${this.apiUrl}/workload/ta?ta_id=${taId}`)
-      .pipe(map(response => response.workload));
+    return this.http.get<{ success: boolean; workload: WorkloadEntry[] }>(`${this.apiUrl}?ta_id=${taId}`).pipe(
+      map(response => response.workload || []),
+      catchError(error => {
+        console.error('Error fetching TA workload entries:', error);
+        return of([]);
+      })
+    );
+  }
+
+  // Get workload entries for a specific course
+  getWorkloadEntriesByCourse(courseId: string): Observable<WorkloadEntry[]> {
+    return this.http.get<{ success: boolean; workload: WorkloadEntry[] }>(`${this.apiUrl}?course_id=${courseId}`).pipe(
+      map(response => response.workload || []),
+      catchError(error => {
+        console.error('Error fetching course workload entries:', error);
+        return of([]);
+      })
+    );
   }
 
   submitWorkload(entry: WorkloadEntry): Observable<{ success: boolean; id: number }> {
-    return this.http.post<{ success: boolean; id: number }>(`${this.apiUrl}/workload`, entry).pipe(
+    return this.http.post<{ success: boolean; id: number }>(this.apiUrl, entry).pipe(
       tap(response => {
         if (response.success) {
-          const taId = entry.taID;
+          const taId = entry.ta_id;
           // Create notification for the TA who submitted the workload
           this.notificationService.addNotification(
-            `You've successfully logged ${entry.hoursspent} hours for ${entry.tasktype} on ${new Date(entry.date).toLocaleDateString()}.`,
+            `You've successfully logged ${entry.hours} hours for ${entry.description} on ${new Date(entry.date).toLocaleDateString()}.`,
             'success',
             {
               event: 'workload_submitted',
@@ -66,8 +101,8 @@ export class WorkloadService {
           );
 
           // Create notification for instructors/admins
-          if (entry.courseID) {
-            this.http.get<any>(`${this.apiUrl}/courses/${entry.courseID}`).subscribe(course => {
+          if (entry.course_id) {
+            this.http.get<any>(`${environment.apiUrl}/courses/${entry.course_id}`).subscribe(course => {
               if (course) {
                 this.taService.getTA(typeof taId === 'string' ? parseInt(taId as string, 10) : taId).subscribe((ta: any) => {
                   const taName = ta ? ta.name : 'A TA';
@@ -75,7 +110,7 @@ export class WorkloadService {
                   
                   // Only send this notification to course instructors, not to authstaff or other roles
                   this.notificationService.addNotification(
-                    `${taName} has logged ${entry.hoursspent} hours for ${entry.tasktype} in ${courseName}.`,
+                    `${taName} has logged ${entry.hours} hours for ${entry.description} in ${courseName}.`,
                     'info',
                     {
                       event: 'workload_instructor_notification',
@@ -93,21 +128,21 @@ export class WorkloadService {
   }
 
   deleteWorkload(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/workload/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
   getCourses(): Observable<Course[]> {
-    return this.http.get<Course[]>(`${this.apiUrl}/courses`);
+    return this.http.get<Course[]>(`${environment.apiUrl}/courses`);
   }  
 
   getTAWorkloadSummaries(period: string): Observable<TAWorkloadSummary[]> {
-    return this.http.get<TAWorkloadSummary[]>(`${this.apiUrl}/workload/summary?period=${period}`);
+    return this.http.get<TAWorkloadSummary[]>(`${environment.apiUrl}/workload/summary?period=${period}`);
   }
 
   // Get workload entries for an instructor
   getInstructorWorkload(instructorId: string | number): Observable<{ success: boolean; workload: InstructorWorkloadEntry[] }> {
     return this.http.get<{ success: boolean; workload: InstructorWorkloadEntry[] }>(
-      `${this.apiUrl}/workload/instructor/${instructorId}`
+      `${environment.apiUrl}/workload/instructor/${instructorId}`
     ).pipe(
       catchError(error => {
         console.error('Error fetching instructor workload:', error);
@@ -118,20 +153,20 @@ export class WorkloadService {
 
   approveWorkloadEntry(taskId: string, approved: boolean): Observable<{ success: boolean }> {
     return this.http.put<{ success: boolean }>(
-      `${this.apiUrl}/workload/${taskId}/approve`,
+      `${this.apiUrl}/${taskId}/approve`,
       { approved }
     ).pipe(
       tap(response => {
         if (response.success) {
           // Get more information about the workload entry to create a better notification
-          this.http.get<any>(`${this.apiUrl}/workload/${taskId}`).subscribe(workloadEntry => {
+          this.http.get<any>(`${this.apiUrl}/${taskId}`).subscribe(workloadEntry => {
             if (workloadEntry) {
-              const taId = workloadEntry.taId;
+              const taId = workloadEntry.ta_id;
               const status = approved ? 'approved' : 'rejected';
               
               // Notification for the TA
               this.notificationService.addNotification(
-                `Your workload entry for ${workloadEntry.tasktype} on ${new Date(workloadEntry.date).toLocaleDateString()} has been ${status}.`,
+                `Your workload entry for ${workloadEntry.description} on ${new Date(workloadEntry.date).toLocaleDateString()} has been ${status}.`,
                 approved ? 'success' : 'warning',
                 {
                   event: 'workload_status_update',
@@ -142,8 +177,8 @@ export class WorkloadService {
               
               // Get TA info for better message
               this.taService.getTA(typeof taId === 'string' ? parseInt(taId as string, 10) : taId).subscribe((ta: any) => {
-                if (ta && workloadEntry.courseId) {
-                  this.http.get<any>(`${this.apiUrl}/courses/${workloadEntry.courseId}`).subscribe(course => {
+                if (ta && workloadEntry.course_id) {
+                  this.http.get<any>(`${environment.apiUrl}/courses/${workloadEntry.course_id}`).subscribe(course => {
                     if (course) {
                       // Instructor notification only
                       this.notificationService.addNotification(
@@ -165,5 +200,19 @@ export class WorkloadService {
       })
     );
   }
-  
+
+  // Add a new workload entry
+  addWorkloadEntry(entry: WorkloadEntry): Observable<WorkloadEntry> {
+    return this.http.post<WorkloadEntry>(this.apiUrl, entry);
+  }
+
+  // Update a workload entry
+  updateWorkloadEntry(entry: WorkloadEntry): Observable<WorkloadEntry> {
+    return this.http.put<WorkloadEntry>(`${this.apiUrl}/${entry.id}`, entry);
+  }
+
+  // Delete a workload entry
+  deleteWorkloadEntry(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }

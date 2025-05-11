@@ -142,10 +142,10 @@ app.post('/api/auth/login', async (req, res) => {
 app.get('/api/assignments', async (req, res) => {
   try {
     const assignments = await db.query(`
-      SELECT a.*, c.course_code, c.title as course_title, u.name as ta_name
+      SELECT a.*, c.course_code, c.name as course_title, u.name as ta_name
       FROM assignments a
-      JOIN courses c ON a.course_id = c.id
-      JOIN users u ON a.ta_id = u.id
+      JOIN course c ON a.course_id = c.id
+      JOIN ta u ON a.ta_id = u.id
     `);
     res.json({ success: true, assignments });
   } catch (error) {
@@ -206,10 +206,10 @@ app.get('/api/workload', async (req, res) => {
     const { ta_id, assignment_id } = req.query;
     
     let query = `
-      SELECT w.*, a.course_id, c.course_code, c.title as course_title
+      SELECT w.*, a.course_id, c.course_code, c.name as course_title
       FROM workload w
       JOIN assignments a ON w.assignment_id = a.id
-      JOIN courses c ON a.course_id = c.id
+      JOIN course c ON a.course_id = c.id
     `;
     
     const params = [];
@@ -273,8 +273,8 @@ app.get('/api/courses', async (req, res) => {
   try {
     const courses = await db.query(`
       SELECT c.*, u.name as coordinator_name
-      FROM courses c
-      LEFT JOIN users u ON c.coordinator_id = u.id
+      FROM course c
+      LEFT JOIN instructor u ON c.coordinator_id = u.id
     `);
     res.json({ success: true, courses });
   } catch (error) {

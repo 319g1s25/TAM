@@ -42,7 +42,7 @@
                   <td>{{ entry.date | date:'mediumDate' }}</td>
                   <td>{{ entry.course_code }} - {{ entry.course_title }}</td>
                   <td>{{ entry.ta_name }} ({{ entry.ta_email }})</td>
-                  <td>{{ entry.hoursspent }}</td>
+                  <td>{{ entry.hours }}</td>
                   <td>{{ entry.description }}</td>
                   <td>
                     <span [class]="getStatusClass(entry.approved)">

@@ -1,11 +1,11 @@
 export interface WorkloadEntry {
     id: number;
-    taID: number;
-    courseID: number;
+    ta_id: number;
+    assignment_id: number;
+    course_id: number;
     date: Date;
-    hoursspent: number;
+    hours: number;
     description: string;
-    tasktype: string;
     approved: boolean | null;
   }
   
