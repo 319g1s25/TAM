@@ -7,6 +7,51 @@
   <!-- TA Proctoring Calendar -->
   <app-ta-proctoring-calendar *ngIf="currentUser?.role === 'ta'"></app-ta-proctoring-calendar>
 
+  <!-- TA Course Assignments Section (only for TAs) -->
+  <div class="ta-assignments-section" *ngIf="currentUser?.role === 'ta'">
+    <div class="section-header">
+      <h2>My Course Assignments</h2>
+    </div>
+    
+    <!-- Loading State -->
+    <div *ngIf="loadingAssignments" class="loading-indicator">
+      <div class="spinner-border"></div>
+      <p>Loading your course assignments...</p>
+    </div>
+    
+    <!-- No Assignments -->
+    <div *ngIf="!loadingAssignments && taAssignments.length === 0" class="no-data-card">
+      <app-icon icon="info" size="large"></app-icon>
+      <p>You are not currently assigned to any courses.</p>
+    </div>
+    
+    <!-- Assignments Table -->
+    <div *ngIf="!loadingAssignments && taAssignments.length > 0" class="assignments-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Course Code</th>
+            <th>Course Name</th>
+            <th>Department</th>
+            <th>Section</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let course of taAssignments">
+            <td><strong>{{ course.courseCode }}</strong></td>
+            <td>{{ course.name }}</td>
+            <td>{{ course.department }}</td>
+            <td>{{ course.section || 'N/A' }}</td>
+            <td>
+              <a [routerLink]="['/courses', course.id]" class="btn btn-sm btn-outline">View Details</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="dashboard-overview">
     <div class="overview-cards">
       <div class="stat-card">
