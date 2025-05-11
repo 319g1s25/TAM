@@ -116,7 +116,7 @@
     <div class="card">
       <div class="card-header">
         <h2>TA Management</h2>
-        <span class="card-badge">{{ stats.taCount }}</span>
+        
       </div>
       <p>Manage teaching assistants and their assignments</p>
       <div class="card-actions">
@@ -128,7 +128,7 @@
     <div class="card">
       <div class="card-header">
         <h2>Course Management</h2>
-        <span class="card-badge">{{ stats.courseCount }}</span>
+        
       </div>
       <p>Add, edit or remove courses and their details</p>
       <div class="card-actions">
@@ -137,10 +137,10 @@
       </div>
     </div>
     
-    <div class="card" *ngIf="currentUser?.role === 'ta' || currentUser?.role === 'instructor'">
+    <div class="card" *ngIf="currentUser?.role === 'ta'">
       <div class="card-header">
         <h2>Workload Management</h2>
-        <span class="card-badge" *ngIf="currentUser?.role === 'instructor'">{{ stats.pendingWorkloadCount }}</span>
+        
       </div>
       <p>Log and manage TA workload entries</p>
       <div class="card-actions">

@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, HostListener } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
@@ -22,6 +22,23 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this.getCurrentUser();
+    this.checkScreenSize();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    this.checkScreenSize();
+  }
+
+  private checkScreenSize() {
+    const width = window.innerWidth;
+    if (width <= 1500) {
+      this.isExpanded = false;
+      this.sidebarToggled.emit(true);
+    } else {
+      this.isExpanded = true;
+      this.sidebarToggled.emit(false);
+    }
   }
 
   getCurrentUser(): void {

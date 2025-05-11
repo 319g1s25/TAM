@@ -4,7 +4,7 @@
       <h2>TAM</h2>
     </div>
     <button class="toggle-btn" (click)="toggleSidebar()" title="Toggle sidebar">
-      <svg class="svg-icon" viewBox="0 0 24 24" fill="#ffffff">
+      <svg [attr.width]="32" [attr.height]="32" viewBox="0 0 24 24" fill="#343a40">
         <path *ngIf="isExpanded" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path>
         <path *ngIf="!isExpanded" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path>
       </svg>
