@@ -11,6 +11,20 @@ import { Exam } from '../../shared/models/exam.model';
 import { Course } from '../../shared/models/course.model';
 import { TA } from '../../shared/models/ta.model';
 
+interface TAProctoringAssignment {
+  id: number;
+  taID: number;
+  examID: number;
+  status: string;
+  date: string;
+  duration: number;
+  proctorsRequired: number;
+  courseId: number;
+  course_code: string;
+  courseName: string;
+  userID?: number;
+}
+
 @Component({
   selector: 'app-proctoring-list',
   standalone: true,
@@ -30,8 +44,9 @@ export class ProctoringListComponent implements OnInit {
   departmentFilter = '';
   dateFilter = '';
   
-  // Permission flag
+  // Permission flags
   canManageProctors = false;
+  isTA = false;
 
   constructor(
     private examService: ExamService,
@@ -44,33 +59,63 @@ export class ProctoringListComponent implements OnInit {
 
   ngOnInit() {
     console.log('ProctoringListComponent initialized');
-    // Check user permissions
     this.checkPermissions();
-    
     this.loadCourses();
     this.loadTAs();
     this.loadExams();
   }
   
   checkPermissions(): void {
+    this.isTA = this.authService.isTA;
     const allowedRoles = ['authstaff', 'deansoffice', 'departmentchair', 'instructor'];
     this.canManageProctors = this.authService.hasRole(allowedRoles);
   }
 
   private loadExams() {
     console.log('Loading exams...');
-    this.examService.getAllExams().subscribe({
-      next: (exams: Exam[]) => {
-        console.log('Exams loaded:', exams);
-        this.exams = exams;
-        this.filteredExams = exams;
-        this.updateAssignmentCounts();
-        this.updateClassroomCounts();
-      },
-      error: (error: any) => {
-        console.error('Error loading exams:', error);
+    if (this.isTA) {
+      const currentUser = this.authService.currentUserValue;
+      if (currentUser && currentUser.id) {
+        const taId = parseInt(currentUser.id, 10);
+        if (!isNaN(taId)) {
+          this.proctoringAssignmentService.getTAProctorings(taId).subscribe({
+            next: (response) => {
+              console.log('TA proctorings loaded:', response);
+              if (response.success && response.assignments) {
+                // Extract exams from assignments
+                this.exams = response.assignments.map((assignment: TAProctoringAssignment) => ({
+                  id: assignment.examID,
+                  userID: assignment.userID || 0,
+                  courseID: assignment.courseId,
+                  date: assignment.date,
+                  duration: assignment.duration,
+                  proctorsRequired: assignment.proctorsRequired
+                }));
+                this.filteredExams = this.exams;
+                this.updateAssignmentCounts();
+                this.updateClassroomCounts();
+              }
+            },
+            error: (error: any) => {
+              console.error('Error loading TA proctorings:', error);
+            }
+          });
+        }
       }
-    });
+    } else {
+      this.examService.getAllExams().subscribe({
+        next: (exams: Exam[]) => {
+          console.log('Exams loaded:', exams);
+          this.exams = exams;
+          this.filteredExams = exams;
+          this.updateAssignmentCounts();
+          this.updateClassroomCounts();
+        },
+        error: (error: any) => {
+          console.error('Error loading exams:', error);
+        }
+      });
+    }
   }
 
   private loadCourses() {

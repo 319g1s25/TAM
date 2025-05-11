@@ -6,7 +6,7 @@
     </div>
     
     <!-- Only show create exam button for authorized users -->
-    <button *ngIf="canManageProctors" class="btn btn-primary create-button" (click)="createNewExam()">
+    <button *ngIf="canManageProctors && !isTA" class="btn btn-primary create-button" (click)="createNewExam()">
       <svg class="icon" viewBox="0 0 24 24" width="24" height="24">
         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
       </svg>
