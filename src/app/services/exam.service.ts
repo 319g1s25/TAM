@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
+import { NotificationService } from './notification.service';
+import { CourseService } from './course.service';
 import { Exam } from '../shared/models/exam.model';
 
 @Injectable({
@@ -9,7 +11,11 @@ import { Exam } from '../shared/models/exam.model';
 export class ExamService {
   private apiUrl = 'http://localhost:3000/api/exams';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private notificationService: NotificationService,
+    private courseService: CourseService
+  ) {}
 
   createExam(examData: {
     courseId: number;
@@ -19,7 +25,16 @@ export class ExamService {
     proctorsRequired: number;
     classrooms: number[];
   }): Observable<Exam> {
-    return this.http.post<Exam>(`${this.apiUrl}`, examData);
+    return this.http.post<Exam>(`${this.apiUrl}`, examData).pipe(
+      tap(createdExam => {
+        // Get course name for better notification message
+        this.courseService.getCourse(examData.courseId).subscribe(course => {
+          const courseName = course ? course.name : 'Unknown Course';
+          const examDate = new Date(examData.date).toLocaleDateString();
+          this.notificationService.notifyExamCreated(`Exam on ${examDate}`, courseName);
+        });
+      })
+    );
   }
 
   getExamById(id: number): Observable<Exam> {

@@ -1,6 +1,8 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationService, Notification } from '../../services/notification.service';
+import { AuthService } from '../../services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-notifications',
@@ -178,15 +180,54 @@ import { NotificationService, Notification } from '../../services/notification.s
     }
   `]
 })
-export class NotificationsComponent {
+export class NotificationsComponent implements OnInit, OnDestroy {
   notifications: Notification[] = [];
   isDropdownOpen = false;
   unreadCount = 0;
+  currentUserId: number | null = null;
+  private userSubscription: Subscription | null = null;
 
-  constructor(private notificationService: NotificationService) {
+  constructor(
+    private notificationService: NotificationService,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    // Get current user ID
+    this.userSubscription = this.authService.currentUser.subscribe(user => {
+      if (user && user.id) {
+        this.currentUserId = parseInt(user.id, 10);
+        this.loadUserNotifications();
+      } else {
+        // If no user is logged in, just show all notifications
+        this.loadAllNotifications();
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+  }
+
+  private loadUserNotifications(): void {
+    if (this.currentUserId) {
+      // Subscribe to notifications and filter them by user ID
+      this.notificationService.notifications$.subscribe(allNotifications => {
+        // Filter notifications: include those with no userId (global) and those matching current user
+        this.notifications = allNotifications.filter(notification => 
+          !notification.userId || notification.userId === this.currentUserId
+        );
+        this.unreadCount = this.notifications.filter(n => !n.read).length;
+      });
+    }
+  }
+
+  private loadAllNotifications(): void {
     this.notificationService.notifications$.subscribe(notifications => {
       this.notifications = notifications;
-      this.unreadCount = this.notificationService.getUnreadCount();
+      this.unreadCount = this.notifications.filter(n => !n.read).length;
     });
   }
 

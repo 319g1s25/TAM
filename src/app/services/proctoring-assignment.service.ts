@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Observable, catchError, throwError, tap } from 'rxjs';
 import { TA } from '../shared/models/ta.model';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { NotificationService } from './notification.service';
+import { ExamService } from './exam.service';
+import { CourseService } from './course.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +14,38 @@ import { environment } from '../../environments/environment';
 export class ProctoringAssignmentService {
   private apiUrl = `${environment.apiUrl}/proctoring-assignments`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private notificationService: NotificationService,
+    private examService: ExamService,
+    private courseService: CourseService
+  ) {}
 
   assignProctors(examId: number, taIds: number[]): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${examId}/assign`, { taIds });
+    return this.http.post<void>(`${this.apiUrl}/${examId}/assign`, { taIds }).pipe(
+      tap(() => {
+        // Get exam details to create meaningful notifications
+        this.examService.getExamById(examId).subscribe(exam => {
+          if (exam) {
+            this.courseService.getCourse(exam.courseID).subscribe(course => {
+              const courseName = course ? course.name : 'Unknown Course';
+              const examDate = new Date(exam.date).toLocaleDateString();
+              
+              // Create notifications for each assigned TA
+              taIds.forEach(taId => {
+                this.notificationService.notifyExamAssignment(
+                  taId, 
+                  examId, 
+                  `Exam on ${examDate}`, 
+                  courseName, 
+                  examDate
+                );
+              });
+            });
+          }
+        });
+      })
+    );
   }
 
   getAssignedTAs(examId: number): Observable<TA[]> {
@@ -22,7 +53,32 @@ export class ProctoringAssignmentService {
   }
 
   autoAssignProctors(examId: number): Observable<{ assignedTAIds: number[] }> {
-    return this.http.post<{ assignedTAIds: number[] }>(`${this.apiUrl}/${examId}/auto`, {});
+    return this.http.post<{ assignedTAIds: number[] }>(`${this.apiUrl}/${examId}/auto`, {}).pipe(
+      tap(response => {
+        if (response && response.assignedTAIds && response.assignedTAIds.length > 0) {
+          // Get exam details to create meaningful notifications
+          this.examService.getExamById(examId).subscribe(exam => {
+            if (exam) {
+              this.courseService.getCourse(exam.courseID).subscribe(course => {
+                const courseName = course ? course.name : 'Unknown Course';
+                const examDate = new Date(exam.date).toLocaleDateString();
+                
+                // Create notifications for each assigned TA
+                response.assignedTAIds.forEach(taId => {
+                  this.notificationService.notifyExamAssignment(
+                    taId, 
+                    examId, 
+                    `Exam on ${examDate}`, 
+                    courseName, 
+                    examDate
+                  );
+                });
+              });
+            }
+          });
+        }
+      })
+    );
   }
   
   getAssignedProctorCount(examId: number): Observable<number> {

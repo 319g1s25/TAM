@@ -14,6 +14,7 @@ const examRoutes = require('./routes/exam.router');
 const classroomRoutes = require('./routes/classroom.router');
 const proctoringRoutes = require('./routes/proctoring-assignment.router');
 const leaveRequestRoutes = require('./routes/leave-request.router');
+const notificationRoutes = require('./routes/notification.router');
 
 console.log('Starting server...');
 console.log('Loaded routes:');
@@ -49,6 +50,7 @@ app.use('/api/exams', examRoutes);
 app.use('/api/classrooms', classroomRoutes);
 app.use('/api/proctoring-assignments', proctoringRoutes);
 app.use('/api/leave-requests', leaveRequestRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Start the server
 async function startServer() {

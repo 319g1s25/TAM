@@ -2,19 +2,20 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { User } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
+import { NotificationsComponent } from '../notifications/notifications.component';
+import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, NotificationsComponent, ThemeToggleComponent],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   isSidebarCollapsed = false;
-  currentUser: User | null = null;
+  currentUser: any = null;
   private userSubscription: Subscription | null = null;
   
   constructor(public authService: AuthService) {}
