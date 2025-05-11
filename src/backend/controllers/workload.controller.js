@@ -40,7 +40,9 @@ exports.getWorkloadsByTA = async (req, res) => {
   if (!ta_id) return res.status(400).json({ error: 'ta_id is required' });
 
   try {
-    const [tasks] = await db.query('SELECT * FROM task WHERE taID = ?', [ta_id]);
+    const tasks = await db.query('SELECT * FROM task WHERE taID = ?', [ta_id]);
+    res.set('Cache-Control', 'no-store');
+    console.log(`Tasks for TA ${ta_id}:`, tasks);
     res.status(200).json({ success: true, workload: tasks });
   } catch (err) {
     console.error('Error fetching TA workload:', err);

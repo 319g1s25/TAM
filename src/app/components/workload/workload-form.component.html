@@ -53,6 +53,9 @@
               <div class="invalid-feedback" *ngIf="hasError('date', 'required')">
                 Please select a date
               </div>
+              <div class="invalid-feedback" *ngIf="hasError('date', 'futureDate')">
+                Cannot select a future date
+              </div>
             </div>
 
             <!-- Description -->
@@ -67,7 +70,7 @@
 
             <!-- Submit Button -->
             <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
+              <button type="submit" class="btn btn-primary" [disabled]="isSubmitting || workloadForm.invalid">
                 <span *ngIf="!isSubmitting">Submit Workload</span>
                 <span *ngIf="isSubmitting">
                   <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>

@@ -6,7 +6,7 @@
   
   <!-- TA Proctoring Calendar -->
   <app-ta-proctoring-calendar *ngIf="currentUser?.role === 'ta'"></app-ta-proctoring-calendar>
-  
+
   <div class="dashboard-overview">
     <div class="overview-cards">
       <div class="stat-card">
@@ -92,15 +92,16 @@
       </div>
     </div>
     
-    <div class="card" *ngIf="currentUser?.role !== 'instructor'">
+    <div class="card" *ngIf="currentUser?.role === 'ta' || currentUser?.role === 'instructor'">
       <div class="card-header">
         <h2>Workload Management</h2>
         <span class="card-badge" *ngIf="currentUser?.role === 'instructor'">{{ stats.pendingWorkloadCount }}</span>
       </div>
       <p>Log and manage TA workload entries</p>
       <div class="card-actions">
-        <a routerLink="/workload/add" class="btn btn-primary">Log Hours</a>
+        <a routerLink="/workload/add" class="btn btn-primary" *ngIf="currentUser?.role === 'ta'">Log Hours</a>
         <a routerLink="/workload/instructor" class="btn btn-outline" *ngIf="currentUser?.role === 'instructor'">Review Entries</a>
+        <a routerLink="/workload/view" class="btn btn-outline" *ngIf="currentUser?.role === 'ta'">View My Hours</a>
       </div>
     </div>
     

@@ -1,7 +1,7 @@
 export interface WorkloadEntry {
     id: number;
-    taId: number;
-    courseId: number;
+    taID: number;
+    courseID: number;
     date: Date;
     hoursspent: number;
     description: string;

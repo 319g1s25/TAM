@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+/*const nodemailer = require('nodemailer');
 
 // Create a transporter using Gmail credentials
 const transporter = nodemailer.createTransport({
@@ -7,7 +7,7 @@ const transporter = nodemailer.createTransport({
     user: 'donotreplytam@gmail.com',
     pass: 'T10/05/2025s'
   }
-});
+});*/
 
 /**
  * Send an email notification

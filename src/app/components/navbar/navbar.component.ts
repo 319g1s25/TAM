@@ -41,12 +41,27 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   // Navigation items - Fixed paths to match defined routes
-  navItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: 'home' },
-    { path: '/performance-reports', label: 'Workload Reports', icon: 'chart-bar' },
-    { path: '/assignments', label: 'Assignments', icon: 'clipboard-list' },
-    { path: '/workload/add', label: 'Log Hours', icon: 'clock' },
-    { path: '/tas', label: 'Teaching Assistants', icon: 'users' },
-    { path: '/courses', label: 'Courses', icon: 'book' }
-  ];
+  get navItems() {
+    const items = [
+      { path: '/dashboard', label: 'Dashboard', icon: 'home' },
+      { path: '/performance-reports', label: 'Workload Reports', icon: 'chart-bar' },
+      { path: '/assignments', label: 'Assignments', icon: 'clipboard-list' },
+      { path: '/workload/add', label: 'Log Hours', icon: 'clock' }
+    ];
+
+    // Add workload view link for TAs
+    if (this.currentUser?.role === 'ta') {
+      items.push({ path: '/workload/view', label: 'View My Hours', icon: 'clock' });
+    }
+
+    // Add admin links
+    if (['authstaff', 'deansoffice', 'departmentchair'].includes(this.currentUser?.role)) {
+      items.push(
+        { path: '/tas', label: 'Teaching Assistants', icon: 'users' },
+        { path: '/courses', label: 'Courses', icon: 'book' }
+      );
+    }
+
+    return items;
+  }
 } 

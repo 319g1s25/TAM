@@ -1,12 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { WorkloadService } from '../../services/workload.service';
 import { WorkloadEntry } from '../../shared/models/task.model';
 import {Course} from '../../shared/models/course.model';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';;
+
+// Custom validator for future dates
+function noFutureDateValidator(control: AbstractControl): ValidationErrors | null {
+  const selectedDate = new Date(control.value);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate date comparison
+  
+  if (selectedDate > today) {
+    return { futureDate: true };
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-workload-form',
@@ -44,7 +56,7 @@ export class WorkloadFormComponent implements OnInit {
       courseID: ['', Validators.required],
       taID: ['', Validators.required],
       hoursspent: ['', [Validators.required, Validators.min(0.5), Validators.max(12)]],
-      date: [this.getCurrentDate(), Validators.required],
+      date: [this.getCurrentDate(), [Validators.required, noFutureDateValidator]],
       description: ['', Validators.maxLength(300)],
       tasktype: ['', Validators.required]
     });

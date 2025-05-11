@@ -53,7 +53,7 @@ export class WorkloadService {
     return this.http.post<{ success: boolean; id: number }>(`${this.apiUrl}/workload`, entry).pipe(
       tap(response => {
         if (response.success) {
-          const taId = entry.taId;
+          const taId = entry.taID;
           // Create notification for the TA who submitted the workload
           this.notificationService.addNotification(
             `You've successfully logged ${entry.hoursspent} hours for ${entry.tasktype} on ${new Date(entry.date).toLocaleDateString()}.`,
@@ -66,8 +66,8 @@ export class WorkloadService {
           );
 
           // Create notification for instructors/admins
-          if (entry.courseId) {
-            this.http.get<any>(`${this.apiUrl}/courses/${entry.courseId}`).subscribe(course => {
+          if (entry.courseID) {
+            this.http.get<any>(`${this.apiUrl}/courses/${entry.courseID}`).subscribe(course => {
               if (course) {
                 this.taService.getTA(typeof taId === 'string' ? parseInt(taId as string, 10) : taId).subscribe((ta: any) => {
                   const taName = ta ? ta.name : 'A TA';

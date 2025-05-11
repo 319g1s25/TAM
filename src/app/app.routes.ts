@@ -37,6 +37,7 @@ export const routes: Routes = [
 
   { path: 'workload/add', component: WorkloadFormComponent, canActivate: [AuthGuard] },
   { path: 'workload/instructor', loadComponent: () => import('./components/workload/instructor-workload.component').then(c => c.InstructorWorkloadComponent), canActivate: [RoleGuard], data: { roles: ['instructor'] } },
+  { path: 'workload/view', loadComponent: () => import('./components/workload/ta-workload.component').then(c => c.TAWorkloadComponent), canActivate: [RoleGuard], data: { roles: ['ta'] } },
 
   { path: 'assignments', component: AssignmentListComponent, canActivate: [AuthGuard] },
   { path: 'assignments/new', component: AssignmentFormComponent, canActivate: [AuthGuard] },
