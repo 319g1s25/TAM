@@ -1,0 +1,132 @@
+<div class="container mt-4">
+  <!-- Main Header and Auto-Assign Button -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card bg-light">
+        <div class="card-body text-center">
+          <h1 class="card-title mb-4">TA Assignment Management</h1>
+          <button type="button" class="btn btn-success btn-lg px-4 py-2" (click)="autoAssignTAs()" [disabled]="isAutoAssigning">
+            <span *ngIf="isAutoAssigning" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <i class="bi bi-magic"></i> Auto-Assign TAs to Courses
+          </button>
+          <p class="text-muted mt-2">Automatically assign TAs to courses based on department, workload, and academic status</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auto-Assignment Results Message -->
+  <div *ngIf="autoAssignmentSummary" class="row mb-4">
+    <div class="col-12">
+      <div class="alert alert-success">
+        <h4 class="alert-heading">Auto-Assignment Complete!</h4>
+        <p>{{ autoAssignmentSummary }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success and Error Messages -->
+  <div *ngIf="successMessage" class="alert alert-success mb-4">
+    {{ successMessage }}
+  </div>
+  
+  <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+    {{ errorMessage }}
+  </div>
+
+  <div class="row">
+    <!-- Current TA Assignments -->
+    <div class="col-lg-8">
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+          <h3><i class="bi bi-list-check"></i> Current TA Assignments</h3>
+        </div>
+        <div class="card-body">
+          <div *ngIf="isLoadingAssignments" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+
+          <div *ngIf="assignments && assignments.length > 0" class="table-responsive">
+            <table class="table table-striped table-hover table-bordered">
+              <thead class="table-dark">
+                <tr>
+                  <th>TA Name</th>
+                  <th>Course</th>
+                  <th>Department</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let assignment of assignments">
+                  <td>{{ assignment.ta.name }} {{ assignment.ta.surname }}</td>
+                  <td>{{ assignment.course.course_code }} - {{ assignment.course.name }}</td>
+                  <td>{{ assignment.course.department }}</td>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-danger" (click)="removeAssignment(assignment.ta.id, assignment.course.id)">
+                      <i class="bi bi-trash"></i> Remove
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="assignments && assignments.length === 0 && !isLoadingAssignments" class="alert alert-info">
+            <i class="bi bi-info-circle"></i> No TA assignments found. Use the form or auto-assign button to create assignments.
+          </div>
+
+          <div *ngIf="assignmentError" class="alert alert-danger">
+            {{ assignmentError }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manual Assignment Form -->
+    <div class="col-lg-4">
+      <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+          <h3><i class="bi bi-pencil-square"></i> Manual Assignment</h3>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="assignmentForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="courseId" class="form-label fw-bold">Course</label>
+              <select id="courseId" formControlName="courseId" class="form-select">
+                <option value="">Select a course</option>
+                <option *ngFor="let course of courses" [value]="course.id">
+                  {{ course.course_code }} - {{ course.name }}
+                </option>
+              </select>
+              <div *ngIf="assignmentForm.get('courseId')?.invalid && assignmentForm.get('courseId')?.touched" class="text-danger mt-1 small">
+                Please select a course
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="taId" class="form-label fw-bold">Teaching Assistant</label>
+              <select id="taId" formControlName="taId" class="form-select">
+                <option value="">Select a TA</option>
+                <option *ngFor="let ta of tas" [value]="ta.id">
+                  {{ ta.name }} {{ ta.surname }} (Workload: {{ ta.totalWorkload }})
+                </option>
+              </select>
+              <div *ngIf="assignmentForm.get('taId')?.invalid && assignmentForm.get('taId')?.touched" class="text-danger mt-1 small">
+                Please select a TA
+              </div>
+            </div>
+            
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary" [disabled]="assignmentForm.invalid || isLoading">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                <i class="bi bi-plus-circle"></i> Assign TA to Course
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

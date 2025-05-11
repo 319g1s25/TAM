@@ -3,7 +3,7 @@
     <h1>Welcome, {{ currentUser?.name || 'User' }}</h1>
     <p class="subtitle">{{ welcomeMessage }}</p>
   </header>
-  
+
   <!-- TA Proctoring Calendar -->
   <app-ta-proctoring-calendar *ngIf="currentUser?.role === 'ta'"></app-ta-proctoring-calendar>
 
@@ -45,33 +45,11 @@
       </div>
     </div>
   </div>
-  
-  <!-- <div class="upcoming-tasks">
-    <h2>Tasks Requiring Attention</h2>
-    <div class="task-list">
-      <div class="task-card" *ngFor="let task of urgentTasks">
-        <div class="task-priority" [ngClass]="task.priority"></div>
-        <div class="task-content">
-          <h3 class="task-title">{{ task.title }}</h3>
-          <p class="task-description">{{ task.description }}</p>
-          <div class="task-meta">
-            <span class="task-deadline">Due: {{ task.deadline | date:'mediumDate' }}</span>
-            <span class="task-category">{{ task.category }}</span>
-          </div>
-        </div>
-        <a [routerLink]="task.actionLink" class="task-action">{{ task.actionText }}</a>
-      </div>
-      <div class="no-tasks" *ngIf="urgentTasks.length === 0">
-        <p>No urgent tasks requiring attention</p>
-      </div>
-    </div>
-  </div> -->
-  
+
   <div class="dashboard-grid">
     <div class="card">
       <div class="card-header">
         <h2>TA Management</h2>
-        <span class="card-badge">{{ stats.taCount }}</span>
       </div>
       <p>Manage teaching assistants and their assignments</p>
       <div class="card-actions">
@@ -79,11 +57,10 @@
         <a *ngIf="hasAdminRights()" routerLink="/tas/new" class="btn btn-outline">Add New</a>
       </div>
     </div>
-    
+
     <div class="card">
       <div class="card-header">
         <h2>Course Management</h2>
-        <span class="card-badge">{{ stats.courseCount }}</span>
       </div>
       <p>Add, edit or remove courses and their details</p>
       <div class="card-actions">
@@ -91,11 +68,10 @@
         <a *ngIf="hasAdminRights()" routerLink="/courses/new" class="btn btn-outline">Add New</a>
       </div>
     </div>
-    
-    <div class="card" *ngIf="currentUser?.role === 'ta' || currentUser?.role === 'instructor'">
+
+    <div class="card" *ngIf="currentUser?.role === 'ta'">
       <div class="card-header">
         <h2>Workload Management</h2>
-        <span class="card-badge" *ngIf="currentUser?.role === 'instructor'">{{ stats.pendingWorkloadCount }}</span>
       </div>
       <p>Log and manage TA workload entries</p>
       <div class="card-actions">
@@ -104,7 +80,7 @@
         <a routerLink="/workload/view" class="btn btn-outline" *ngIf="currentUser?.role === 'ta'">View My Hours</a>
       </div>
     </div>
-    
+
     <div class="card" *ngIf="currentUser?.role === 'instructor'">
       <div class="card-header">
         <h2>Workload Review</h2>
@@ -115,7 +91,7 @@
         <a routerLink="/workload/instructor" class="btn btn-primary">Review Entries</a>
       </div>
     </div>
-    
+
     <div class="card">
       <div class="card-header">
         <h2>Exam Management</h2>
@@ -127,7 +103,7 @@
         <a *ngIf="canManageExams()" routerLink="/proctoring/new" class="btn btn-outline">Schedule Exam</a>
       </div>
     </div>
-    
+
     <div class="card">
       <div class="card-header">
         <h2>Performance Reports</h2>
@@ -139,7 +115,6 @@
       </div>
     </div>
 
-    <!-- Leave Management card for all users -->
     <div class="card">
       <div class="card-header">
         <h2>Leave Management</h2>
@@ -152,4 +127,4 @@
       </div>
     </div>
   </div>
-</div> 
+</div>

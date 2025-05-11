@@ -1,4 +1,4 @@
-<div class="auth-container">
+
   <div class="auth-card">
     <div class="auth-header">
       <h1>TAM</h1>
@@ -9,13 +9,16 @@
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <div class="form-field">
           <label for="email">Email</label>
-          <input 
-            type="email" 
-            id="email" 
-            formControlName="email" 
-            placeholder="Enter your email"
-            [ngClass]="{'invalid': loginForm.get('email')?.invalid && loginForm.get('email')?.touched}"
-          >
+          <div class="input-container">
+            <span class="material-icons input-icon">email</span>
+            <input 
+              type="email" 
+              id="email" 
+              formControlName="email" 
+              placeholder="Enter your email"
+              [ngClass]="{'invalid': loginForm.get('email')?.invalid && loginForm.get('email')?.touched}"
+            >
+          </div>
           <div class="error-message" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
             <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</span>
             <span *ngIf="loginForm.get('email')?.errors?.['email']">Invalid email format</span>
@@ -24,13 +27,16 @@
         
         <div class="form-field">
           <label for="password">Password</label>
-          <input 
-            type="password" 
-            id="password" 
-            formControlName="password"
-            placeholder="Enter your password"
-            [ngClass]="{'invalid': loginForm.get('password')?.invalid && loginForm.get('password')?.touched}"
-          >
+          <div class="input-container">
+            <span class="material-icons input-icon">lock</span>
+            <input 
+              type="password" 
+              id="password" 
+              formControlName="password"
+              placeholder="Enter your password"
+              [ngClass]="{'invalid': loginForm.get('password')?.invalid && loginForm.get('password')?.touched}"
+            >
+          </div>
           <div class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
             <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</span>
             <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</span>
@@ -52,4 +58,3 @@
       </form>
     </div>
   </div>
-</div> 

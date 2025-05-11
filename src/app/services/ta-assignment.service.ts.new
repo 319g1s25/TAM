@@ -22,14 +22,7 @@ export class TAAssignmentService {
     message: string;
     totalCoursesAssigned: number;
   }> { 
-    console.log('Calling auto-assign TA endpoint');
-    return this.http.post<{ message: string; totalCoursesAssigned: number; }>(`${this.apiUrl}/ta-assignments/auto`, {})
-      .pipe(
-        catchError((error: HttpErrorResponse) => {
-          console.error('Error during auto-assignment:', error);
-          throw error;
-        })
-      );
+    return this.http.post<{ message: string; totalCoursesAssigned: number; }>(`${this.apiUrl}/assignments/auto`, {});
   }
 
   /**
