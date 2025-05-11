@@ -23,9 +23,9 @@
 }
 
 .content {
+  flex: 1;
   padding: 24px;
-  box-sizing: border-box;
-  min-height: calc(100vh - 64px); /* Subtracting header height */
+  /* background-color: #f5f7fa; */
 }
 
 .main-header {
@@ -162,7 +162,7 @@ router-outlet + * {
 .content {
   flex: 1;
   padding: 24px;
-  background-color: #f5f7fa;
+  /* background-color: #f5f7fa; */
 }
 
 /* Responsive Styles */
