@@ -1,0 +1,46 @@
+<div class="container">
+      <header class="content-header">
+        <h1>{{ isEditMode ? 'Edit Classroom' : 'Add Classroom' }}</h1>
+        <p class="subtitle">{{ isEditMode ? 'Update classroom information' : 'Create a new classroom' }}</p>
+      </header>
+
+      <form [formGroup]="classroomForm" (ngSubmit)="onSubmit()" class="form-container">
+        <div class="form-group">
+          <label for="name">Classroom Name</label>
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            class="form-control"
+            [class.is-invalid]="classroomForm.get('name')?.invalid && classroomForm.get('name')?.touched"
+          >
+          <div class="invalid-feedback" *ngIf="classroomForm.get('name')?.errors?.['required'] && classroomForm.get('name')?.touched">
+            Classroom name is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="capacity">Capacity</label>
+          <input
+            type="number"
+            id="capacity"
+            formControlName="capacity"
+            class="form-control"
+            [class.is-invalid]="classroomForm.get('capacity')?.invalid && classroomForm.get('capacity')?.touched"
+          >
+          <div class="invalid-feedback" *ngIf="classroomForm.get('capacity')?.errors?.['required'] && classroomForm.get('capacity')?.touched">
+            Capacity is required
+          </div>
+          <div class="invalid-feedback" *ngIf="classroomForm.get('capacity')?.errors?.['min'] && classroomForm.get('capacity')?.touched">
+            Capacity must be at least 1
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" (click)="goBack()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="classroomForm.invalid">
+            {{ isEditMode ? 'Update' : 'Create' }} Classroom
+          </button>
+        </div>
+      </form>
+    </div>

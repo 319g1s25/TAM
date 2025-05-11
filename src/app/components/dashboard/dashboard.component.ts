@@ -23,6 +23,7 @@ import { TaProctoringCalendarComponent } from './ta-proctoring-calendar/ta-proct
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
+  isAdminView = false;
   welcomeMessage = 'Welcome to your Dashboard';
   stats: DashboardStats = {
     taCount: 0,
@@ -50,7 +51,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.currentUser = user;
       this.setWelcomeMessage();
     });
-
+    this.isAdminView = this.authService.hasRole(['authstaff', 'deansoffice']);
     this.loadDashboardStats();
   }
 

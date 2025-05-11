@@ -120,7 +120,13 @@ export class ProctoringListComponent implements OnInit {
 
   private loadCourses() {
     console.log('Loading courses...');
-    this.courseService.getAllCourses().subscribe({
+    const currentUser = this.authService.currentUserValue;
+    if (!currentUser) {
+      console.error('No current user found');
+      return;
+    }
+
+    this.courseService.getCoursesByRole(currentUser.role, currentUser.id).subscribe({
       next: (courses: Course[]) => {
         console.log('Courses loaded:', courses);
         this.courses = courses;
@@ -132,6 +138,25 @@ export class ProctoringListComponent implements OnInit {
   }
 
   private loadTAs() {
+  const currentUser = this.authService.currentUserValue;
+  console.log('Loading TAs with:', currentUser);
+
+  if (!currentUser || !currentUser.role || !currentUser.id) {
+    console.warn('User not authenticated for TA loading.');
+    return;
+  }
+
+  this.taService.getTAsByRole(currentUser.role, currentUser.id).subscribe({
+    next: (tas: TA[]) => {
+      this.tas = tas.filter(ta => !ta.isOnLeave && ta.proctoringEnabled);
+    },
+    error: (error: any) => {
+      console.error('Error loading TAs:', error);
+    }
+  });
+}
+
+  /*private loadTAs() {
     this.taService.getAllTAs().subscribe({
       next: (tas: TA[]) => {
         this.tas = tas.filter(ta => !ta.isOnLeave && ta.proctoringEnabled);
@@ -140,7 +165,7 @@ export class ProctoringListComponent implements OnInit {
         console.error('Error loading TAs:', error);
       }
     });
-  }
+  }*/
 
   private updateAssignmentCounts() {
     // Update the counts for each exam

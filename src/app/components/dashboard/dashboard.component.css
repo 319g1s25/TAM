@@ -1,9 +1,9 @@
 .dashboard-container {
-  padding: 20px;
+  padding: 2rem;
 }
 
 .dashboard-header {
-  margin-bottom: 30px;
+  margin-bottom: 2rem;
 }
 
 .dashboard-header h1 {
@@ -14,9 +14,8 @@
 }
 
 .subtitle {
-  font-size: 1rem;
-  color: var(--light-text-color);
-  margin: 0;
+  color: #666;
+  margin-bottom: 1rem;
 }
 
 /* Overview cards styling */
@@ -234,18 +233,16 @@
 /* Dashboard grid cards */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .card {
-  background: var(--card-color);
+  background: white;
   border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .card:hover {
@@ -257,76 +254,126 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 1rem;
 }
 
-.card h2 {
-  font-size: 1.3rem;
-  margin: 0 0 10px;
-  color: var(--primary-text-color);
-}
-
-.card p {
-  color: var(--light-text-color);
-  margin: 0 0 20px;
-  flex-grow: 1;
-  font-size: 0.9rem;
+.card-header h2, .card-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
 }
 
 .card-badge {
-  background: var(--primary-light-color);
-  color: var(--primary-color);
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.875rem;
+}
+
+.card p {
+  color: #666;
+  margin-bottom: 1.5rem;
 }
 
 .card-actions {
   display: flex;
-  gap: 10px;
+  gap: 0.75rem;
 }
 
 .btn {
-  padding: 8px 16px;
+  padding: 0.75rem 1.5rem;
   border-radius: 4px;
-  font-weight: 500;
+  font-size: 0.875rem;
   cursor: pointer;
-  text-align: center;
   text-decoration: none;
-  transition: background-color 0.2s ease, color 0.2s ease;
-  font-size: 0.9rem;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
 }
 
 .btn-primary {
-  background-color: var(--primary-color);
+  background: #1976d2;
   color: white;
   border: none;
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-dark-color);
+  background: #1565c0;
 }
 
 .btn-outline {
-  background-color: transparent;
-  color: var(--primary-color);
-  border: 1px solid var(--primary-color);
+  background: white;
+  border: 1px solid #ddd;
+  color: #666;
 }
 
 .btn-outline:hover {
-  background-color: var(--primary-light-color);
+  background: #f5f5f5;
 }
 
-.btn-accent {
-  background-color: var(--accent-color);
-  color: white;
-  border: none;
+/* Management Section Styles */
+.management-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
 }
 
-.btn-accent:hover {
-  background-color: var(--accent-dark-color);
+.section-title {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.management-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.management-grid .card {
+  background: #f8f9fa;
+  border: 1px solid #eee;
+}
+
+.management-grid .card-header h3 {
+  font-size: 1.1rem;
+  color: #1976d2;
+}
+
+.management-grid .card p {
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.management-grid .btn-primary {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Loading Animation */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Responsive adjustments */

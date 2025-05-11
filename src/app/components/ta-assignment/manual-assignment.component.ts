@@ -7,6 +7,7 @@ import { TAAssignmentService } from '../../services/ta-assignment.service';
 import { TA } from '../../shared/models/ta.model';
 import { Course } from '../../shared/models/course.model';
 import { HttpErrorResponse } from '@angular/common/http';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-manual-assignment',
@@ -32,7 +33,8 @@ export class ManualAssignmentComponent implements OnInit {
     private fb: FormBuilder,
     private taService: TAService,
     private courseService: CourseService,
-    private taAssignmentService: TAAssignmentService
+    private taAssignmentService: TAAssignmentService,
+    private authService: AuthService
   ) {
     this.assignmentForm = this.fb.group({
       taId: [null, Validators.required],
@@ -59,9 +61,12 @@ export class ManualAssignmentComponent implements OnInit {
   }
 
   loadCourses(): void {
-    this.courseService.getAllCourses().subscribe({
-      next: (data) => {
-        this.courses = data;
+    const currentUser = this.authService.currentUserValue;
+    const role = currentUser?.role || '';
+    const userId = currentUser?.id?.toString() || '';
+    this.courseService.getCoursesByRole(role, userId).subscribe({
+      next: (courses) => {
+        this.courses = courses;
       },
       error: (error) => {
         console.error('Error loading courses:', error);

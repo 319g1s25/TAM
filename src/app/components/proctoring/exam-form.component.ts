@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ExamService } from '../../services/exam.service';
 import { CourseService } from '../../services/course.service';
@@ -8,6 +8,18 @@ import { AuthService } from '../../services/auth.service';
 import { ClassroomService } from '../../services/classroom.service';
 import { Course } from '../../shared/models/course.model';
 import { Classroom } from '../../shared/models/classroom.model';
+
+// Custom validator for past dates
+function noPastDateValidator(control: AbstractControl): ValidationErrors | null {
+  const selectedDate = new Date(control.value);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate date comparison
+  
+  if (selectedDate < today) {
+    return { pastDate: true };
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-exam-form',
@@ -22,6 +34,7 @@ export class ExamFormComponent implements OnInit {
   selectedClassrooms: number[] = [];
   currentUserId: string = '';
   errorMessage: string = '';
+  minDate: string;
 
   constructor(
     private fb: FormBuilder,
@@ -31,9 +44,13 @@ export class ExamFormComponent implements OnInit {
     private authService: AuthService,
     public router: Router
   ) {
+    // Set minimum date to today
+    const today = new Date();
+    this.minDate = today.toISOString().split('T')[0];
+
     this.examForm = this.fb.group({
       courseId: ['', Validators.required],
-      date: ['', Validators.required],
+      date: ['', [Validators.required, noPastDateValidator]],
       duration: ['', [Validators.required, Validators.min(1)]],
       proctorsRequired: ['', [Validators.required, Validators.min(1)]],
       classrooms: [[], Validators.required],
@@ -58,17 +75,17 @@ export class ExamFormComponent implements OnInit {
   }
 
   loadCourses(): void {
-    this.courseService.getAllCourses().subscribe(
-      courses => {
-        this.courses = courses;
-        console.log('Loaded courses:', this.courses);
-      },
-      error => {
-        console.error('Error loading courses:', error);
-        this.errorMessage = 'Failed to load courses. Please try again.';
-      }
-    );
-  }
+  const currentUser = this.authService.currentUserValue;
+  if (!currentUser) return;
+
+  const { role, id: userId } = currentUser;
+
+  this.courseService.getCoursesByRole(role, userId).subscribe({
+    next: (courses) => {this.courses = courses; console.log('loaded courses: ', this.courses);},
+    error: () => this.errorMessage = 'Could not load courses'
+  });
+}
+
 
   loadClassrooms(): void {
     this.classroomService.getAllClassrooms().subscribe(

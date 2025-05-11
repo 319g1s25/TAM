@@ -1,12 +1,48 @@
 const db = require('../db');
 
 exports.getAllCourses = async (req, res) => {
+  const { role, userId } = req.query;
+
   try {
-    const courses = await db.query('SELECT * FROM course');
-    res.status(200).json(courses);
+    let courses;
+
+    if (role === 'instructor') {
+      // Only courses the instructor teaches
+      courses = await db.query(`
+        SELECT c.* FROM course c
+        JOIN instructor_course ic ON c.id = ic.courseID
+        WHERE ic.instructorID = ?
+      `, [userId]);
+
+    } else if (role === 'departmentchair') {
+      // All courses in their department
+
+      const result = await db.query(`SELECT department FROM departmentchair WHERE id = ?`, [userId]);
+
+      if (!result || result.length === 0) {
+        return res.status(404).json({ success: false, message: 'Department not found' });
+      }
+
+      const department = result[0].department;
+
+      courses = await db.query(
+        `SELECT * FROM course WHERE department = ?`,
+        [department]
+    );
+
+    } else if (role === 'authstaff' || role === 'deansoffice' || role === 'ta') {
+      // All courses
+      courses = await db.query('SELECT * FROM course');
+      
+    }
+    else {
+      return res.status(403).json({ success: false, message: 'Unauthorized role' });
+    }
+
+    res.status(200).json({ success: true, courses });
   } catch (err) {
-    console.error('Error loading courses:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error fetching courses:', err);
+    res.status(500).json({ success: false, error: 'Database error' });
   }
 };
 

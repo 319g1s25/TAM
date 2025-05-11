@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
@@ -55,7 +55,8 @@ export class PerformanceReportsComponent implements OnInit {
   constructor(
     private taService: TAService,
     private workloadService: WorkloadService,
-    private tacourseService: TACourseService
+    private tacourseService: TACourseService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -69,10 +70,12 @@ export class PerformanceReportsComponent implements OnInit {
         this.tas = tas.filter(ta => typeof ta.id === 'number');
         this.processTASummaries();
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error('Error loading TAs:', err);
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }

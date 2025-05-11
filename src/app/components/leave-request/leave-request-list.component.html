@@ -67,7 +67,7 @@
         </div>
       </div>
 
-      <div class="request-actions" *ngIf="(isDeansOffice || isAuthStaff) && request.status.toLowerCase() === 'pending'">
+      <div class="request-actions" *ngIf="(isDeansOffice || isAuthStaff || isDepartmentChair) && request.status.toLowerCase() === 'pending'">
         <button (click)="approveRequest(request.id)" class="btn btn-outline approve-btn">Approve</button>
         <button (click)="rejectRequest(request.id)" class="btn btn-outline reject-btn">Reject</button>
       </div>

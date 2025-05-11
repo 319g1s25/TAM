@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Course } from '../shared/models/course.model';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,15 @@ export class CourseService {
   getAllCourses(): Observable<Course[]> {
     return this.http.get<Course[]>(`${this.apiUrl}`);
   }
+  
+  getCoursesByRole(role: string, userId: string): Observable<Course[]> {
+  return this.http.get<{ success: boolean; courses: Course[] }>(
+    `${this.apiUrl}`, {
+      params: { role, userId }
+    }
+  ).pipe(map(res => res.courses));
+}
+
 
   // Get a course by ID
   getCourse(id: number): Observable<Course> {

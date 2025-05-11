@@ -10,6 +10,50 @@ exports.getAllTAs = async (req, res) => {
   }
 };
 
+exports.getAllTAsByRole = async (req, res) => {
+  const { role, userId } = req.query;
+  console.log('Role-based TA request:', { role, userId });
+
+  try {
+    let tas;
+
+    if (role === 'instructor') {
+      console.log('Fetching instructor department...');
+      const result = await db.query(`SELECT department FROM instructor WHERE id = ?`, [userId]);
+      console.log('Instructor query result:', result);
+      if (!result || result.length === 0) {
+        return res.status(404).json({ error: 'Instructor department not found' });
+      }
+      const department = result[0].department;
+
+      tas = await db.query(`SELECT * FROM ta WHERE department = ?`, [department]);
+
+    } else if (role === 'departmentchair') {
+      console.log('Fetching department chair department...');
+      const result = await db.query(`SELECT department FROM departmentchair WHERE id = ?`, [userId]);
+      console.log('Department chair query result:', result);
+      if (!result || result.length === 0) {
+        return res.status(404).json({ error: 'Chair department not found' });
+      }
+      const department = result[0].department;
+
+      tas = await db.query(`SELECT * FROM ta WHERE department = ?`, [department]);
+
+    } else if (role === 'authstaff' || role === 'deansoffice') {
+      tas = await db.query('SELECT * FROM ta');
+
+    } else {
+      console.warn('Unauthorized role received:', role);
+      return res.status(403).json({ error: 'Unauthorized role' });
+    }
+
+    res.status(200).json(tas);
+  } catch (err) {
+    console.error('Error loading TAs:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 exports.getTAById = async (req, res) => {
   const { id } = req.params;
   try {

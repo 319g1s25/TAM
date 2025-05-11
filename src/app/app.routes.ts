@@ -57,6 +57,22 @@ export const routes: Routes = [
 
   { path: 'ta-assignments', component: ManualAssignmentComponent, canActivate: [RoleGuard], data: { roles: ['authstaff', 'deansoffice', 'departmentchair', 'instructor'] } },
 
+  { path: 'instructors', loadComponent: () => import('./components/management/instructor-list/instructor-list.component').then(c => c.InstructorListComponent), canActivate: [RoleGuard], data: { roles: ['authstaff'] } },
+  { path: 'instructors/new', loadComponent: () => import('./components/management/instructor-form/instructor-form.component').then(c => c.InstructorFormComponent), canActivate: [RoleGuard], data: { roles: ['authstaff'] } },
+  { path: 'instructors/:id', loadComponent: () => import('./components/management/instructor-form/instructor-form.component').then(c => c.InstructorFormComponent), canActivate: [RoleGuard], data: { roles: ['authstaff'] } },
+
+  { path: 'deansoffice', loadComponent: () => import('./components/management/deansoffice-list/deansoffice-list.component').then(c => c.DeansOfficeListComponent), canActivate: [RoleGuard], data: { roles: ['authstaff'] } },
+  { path: 'deansoffice/new', loadComponent: () => import('./components/management/deansoffice-form/deansoffice-form.component').then(c => c.DeansOfficeFormComponent), canActivate: [RoleGuard], data: { roles: ['authstaff'] } },
+  { path: 'deansoffice/:id', loadComponent: () => import('./components/management/deansoffice-form/deansoffice-form.component').then(c => c.DeansOfficeFormComponent), canActivate: [RoleGuard], data: { roles: ['authstaff'] } },
+
+  { path: 'departmentchairs', loadComponent: () => import('./components/management/departmentchair-list/departmentchair-list.component').then(c => c.DepartmentChairListComponent), canActivate: [RoleGuard], data: { roles: ['authstaff'] } },
+  { path: 'departmentchairs/new', loadComponent: () => import('./components/management/departmentchair-form/departmentchair-form.component').then(c => c.DepartmentChairFormComponent), canActivate: [RoleGuard], data: { roles: ['authstaff'] } },
+  { path: 'departmentchairs/:id', loadComponent: () => import('./components/management/departmentchair-form/departmentchair-form.component').then(c => c.DepartmentChairFormComponent), canActivate: [RoleGuard], data: { roles: ['authstaff'] } },
+
+  { path: 'classrooms', loadComponent: () => import('./components/management/classroom-list/classroom-list.component').then(c => c.ClassroomListComponent), canActivate: [RoleGuard], data: { roles: ['authstaff'] } },
+  { path: 'classrooms/new', loadComponent: () => import('./components/management/classroom-form/classroom-form.component').then(c => c.ClassroomFormComponent), canActivate: [RoleGuard], data: { roles: ['authstaff'] } },
+  { path: 'classrooms/:id', loadComponent: () => import('./components/management/classroom-form/classroom-form.component').then(c => c.ClassroomFormComponent), canActivate: [RoleGuard], data: { roles: ['authstaff'] } },
+
   { path: '**', redirectTo: '/dashboard' }
 ];
 
