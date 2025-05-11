@@ -1,7 +1,7 @@
 <div class="content-container">
     <header class="content-header">
       <h1>Course Management</h1>
-      <button class="btn btn-accent" routerLink="/courses/new" *ngIf="currentUserRole !== 'ta'">
+      <button class="btn btn-accent" routerLink="/courses/new" *ngIf="currentUserRole !== 'ta' && currentUserRole !== 'instructor'">
         <app-icon icon="add"></app-icon>
         Add New Course
       </button>
