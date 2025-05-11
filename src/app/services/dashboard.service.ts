@@ -16,6 +16,18 @@ export interface DashboardStats {
   examCount: number;
 }
 
+export interface TaAssignment {
+  id: string;
+  courseId: string;
+  courseCode: string;
+  name: string;
+  courseName: string;
+  instructor: string;
+  status: string;
+  department: string;
+  section?: string;
+}
+
 /*export interface UrgentTask {
   title: string;
   description: string;
@@ -36,6 +48,10 @@ export class DashboardService {
 
   getStats(): Observable<{ success: boolean; stats: DashboardStats }> {
     return this.http.get<{ success: boolean; stats: DashboardStats }>(this.apiUrl);
+  }
+
+  getTaAssignments(): Observable<TaAssignment[]> {
+    return this.http.get<TaAssignment[]>(`${this.apiUrl}/ta-assignments`);
   }
 
   /*getUrgentTasks(): Observable<UrgentTask[]> {

@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { IconComponent } from '../shared/icon.component';
 import { User } from '../../shared/models/user.model';
 import { AuthService } from '../../services/auth.service';
-import { DashboardService, DashboardStats } from '../../services/dashboard.service';
+import { DashboardService, DashboardStats, TaAssignment } from '../../services/dashboard.service';
 //import {  UrgentTask } from '../../services/dashboard.service';
 import { Subscription } from 'rxjs';
 import { TaProctoringCalendarComponent } from './ta-proctoring-calendar/ta-proctoring-calendar.component';
@@ -24,6 +24,8 @@ import { TaProctoringCalendarComponent } from './ta-proctoring-calendar/ta-proct
 export class DashboardComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
   welcomeMessage = 'Welcome to your Dashboard';
+  loadingAssignments = false;
+  taAssignments: TaAssignment[] = [];
   stats: DashboardStats = {
     taCount: 0,
     courseCount: 0,
@@ -39,6 +41,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   };
   //urgentTasks: UrgentTask[] = [];
   private userSubscription: Subscription | null = null;
+  private assignmentsSubscription: Subscription | null = null;
 
   constructor(
     public authService: AuthService,
@@ -49,6 +52,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.userSubscription = this.authService.currentUser.subscribe(user => {
       this.currentUser = user;
       this.setWelcomeMessage();
+      if (user?.role === 'ta') {
+        this.loadTaAssignments();
+      }
     });
 
     this.loadDashboardStats();
@@ -57,6 +63,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.userSubscription) {
       this.userSubscription.unsubscribe();
+    }
+    if (this.assignmentsSubscription) {
+      this.assignmentsSubscription.unsubscribe();
     }
   }
 
@@ -108,6 +117,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
       },
       error: (error: Error) => {
         console.error('Error loading dashboard stats:', error);
+      }
+    });
+  }
+
+  private loadTaAssignments(): void {
+    this.loadingAssignments = true;
+    this.assignmentsSubscription = this.dashboardService.getTaAssignments().subscribe({
+      next: (assignments: TaAssignment[]) => {
+        this.taAssignments = assignments;
+        this.loadingAssignments = false;
+      },
+      error: (error: Error) => {
+        console.error('Error loading TA assignments:', error);
+        this.loadingAssignments = false;
       }
     });
   }
