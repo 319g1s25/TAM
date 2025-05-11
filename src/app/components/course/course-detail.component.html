@@ -50,7 +50,7 @@
         </div>
 
         <div class="action-buttons">
-          <button class="btn btn-accent" (click)="onEdit()" *ngIf="currentUserRole !== 'ta'">Edit Course</button>
+          <button class="btn btn-accent" (click)="onEdit()" *ngIf="currentUserRole !== 'ta' && currentUserRole !== 'instructor'">Edit Course</button>
           <button class="btn btn-secondary" (click)="onBack()">Back to List</button>
         </div>
       </div>
