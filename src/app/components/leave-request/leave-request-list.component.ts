@@ -35,6 +35,7 @@ export class LeaveRequestListComponent implements OnInit {
   currentUserId: string = '';
   isDeansOffice = false;
   isAuthStaff = false;
+  isDepartmentChair = false;
 
   constructor(
     private authService: AuthService,
@@ -47,9 +48,11 @@ export class LeaveRequestListComponent implements OnInit {
     this.isAdminView = currentUser?.role !== 'ta';
     this.isDeansOffice = currentUser?.role === 'deansoffice';
     this.isAuthStaff = currentUser?.role === 'authstaff';
+    this.isDepartmentChair = currentUser?.role === 'departmentchair';
     console.log('Current user role:', currentUser?.role);
     console.log('isAuthStaff:', this.isAuthStaff);
     console.log('isDeansOffice:', this.isDeansOffice);
+    console.log('isDepartmentChair:', this.isDepartmentChair);
     this.loadLeaveRequests();
   }
 
@@ -89,58 +92,58 @@ export class LeaveRequestListComponent implements OnInit {
   }
 
   approveRequest(id: number): void {
-  if (!this.isDeansOffice && !this.isAuthStaff) return;
+    if (!this.isDeansOffice && !this.isAuthStaff && !this.isDepartmentChair) return;
 
-  const request = this.leaveRequests.find(r => r.id === id);
-  if (!request) return;
+    const request = this.leaveRequests.find(r => r.id === id);
+    if (!request) return;
 
-  const reviewData = {
-    status: 'approved' as 'Approved',
-    reviewedBy: this.authService.currentUserValue?.name || 'System',
-    reviewDate: new Date().toISOString(),
-    reviewComments: 'Approved.'
-  };
+    const reviewData = {
+      status: 'approved' as 'Approved',
+      reviewedBy: this.authService.currentUserValue?.name || 'System',
+      reviewDate: new Date().toISOString(),
+      reviewComments: 'Approved.'
+    };
 
-  this.leaveReqService.updateLeaveRequestStatus(id, reviewData).subscribe({
-    next: () => {
-      // Update local UI after backend success
-      request.status = 'Approved';
-      request.reviewedBy = reviewData.reviewedBy;
-      request.reviewDate = reviewData.reviewDate;
-      request.reviewComments = reviewData.reviewComments;
-      this.applyFilters();
-    },
-    error: err => {
-      console.error('Failed to approve request:', err);
-    }
-  });
-}
+    this.leaveReqService.updateLeaveRequestStatus(id, reviewData).subscribe({
+      next: () => {
+        // Update local UI after backend success
+        request.status = 'Approved';
+        request.reviewedBy = reviewData.reviewedBy;
+        request.reviewDate = reviewData.reviewDate;
+        request.reviewComments = reviewData.reviewComments;
+        this.applyFilters();
+      },
+      error: err => {
+        console.error('Failed to approve request:', err);
+      }
+    });
+  }
 
-rejectRequest(id: number): void {
-  if (!this.isDeansOffice && !this.isAuthStaff) return;
+  rejectRequest(id: number): void {
+    if (!this.isDeansOffice && !this.isAuthStaff && !this.isDepartmentChair) return;
 
-  const request = this.leaveRequests.find(r => r.id === id);
-  if (!request) return;
+    const request = this.leaveRequests.find(r => r.id === id);
+    if (!request) return;
 
-  const reviewData = {
-    status: 'rejected' as 'Rejected',
-    reviewedBy: this.authService.currentUserValue?.name || 'System',
-    reviewDate: new Date().toISOString(),
-    reviewComments: 'Rejected.'
-  };
+    const reviewData = {
+      status: 'rejected' as 'Rejected',
+      reviewedBy: this.authService.currentUserValue?.name || 'System',
+      reviewDate: new Date().toISOString(),
+      reviewComments: 'Rejected.'
+    };
 
-  this.leaveReqService.updateLeaveRequestStatus(id, reviewData).subscribe({
-    next: () => {
-      request.status = 'Rejected';
-      request.reviewedBy = reviewData.reviewedBy;
-      request.reviewDate = reviewData.reviewDate;
-      request.reviewComments = reviewData.reviewComments;
-      this.applyFilters();
-    },
-    error: err => {
-      console.error('Failed to reject request:', err);
-    }
-  });
-}
+    this.leaveReqService.updateLeaveRequestStatus(id, reviewData).subscribe({
+      next: () => {
+        request.status = 'Rejected';
+        request.reviewedBy = reviewData.reviewedBy;
+        request.reviewDate = reviewData.reviewDate;
+        request.reviewComments = reviewData.reviewComments;
+        this.applyFilters();
+      },
+      error: err => {
+        console.error('Failed to reject request:', err);
+      }
+    });
+  }
 
 }

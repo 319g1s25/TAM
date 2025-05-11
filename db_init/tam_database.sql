@@ -167,6 +167,7 @@ CREATE TABLE `departmentchair` (
   `surname` varchar(60) NOT NULL,
   `email` varchar(60) DEFAULT NULL,
   `password` varchar(70) DEFAULT NULL,
+  `department` varchar(60) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -177,7 +178,7 @@ CREATE TABLE `departmentchair` (
 
 LOCK TABLES `departmentchair` WRITE;
 /*!40000 ALTER TABLE `departmentchair` DISABLE KEYS */;
-INSERT INTO `departmentchair` VALUES (1,'Begüm','Çınar','begum@bilkent.edu.tr','begum1234');
+INSERT INTO `departmentchair` VALUES (1,'Begüm','Çınar','begum@bilkent.edu.tr','begum1234', 'Computer Science'), (2, 'Vegün', 'Ekmekçi', 'vegun@bilkent.edu.tr', 'vegun1234', 'Endustrial Engineering');
 /*!40000 ALTER TABLE `departmentchair` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -99,16 +99,23 @@ export class ProctorAssignmentComponent implements OnInit {
   }
 
   loadTAs(): void {
-    this.taService.getAllTAs().subscribe(
-      tas => {
-        this.tas = tas.filter(ta => !ta.isOnLeave && ta.proctoringEnabled);
-        this.applySort(this.currentSort);
-      },
-      error => {
-        console.error('Error loading TAs:', error);
-      }
-    );
+  const currentUser = this.authService.currentUserValue;
+
+  if (!currentUser || !currentUser.role || !currentUser.id) {
+    console.warn('Missing user info for TA loading');
+    return;
   }
+
+  this.taService.getTAsByRole(currentUser.role, currentUser.id).subscribe(
+    tas => {
+      this.tas = tas.filter(ta => !ta.isOnLeave && ta.proctoringEnabled);
+      this.applySort(this.currentSort);
+    },
+    error => {
+      console.error('Error loading TAs:', error);
+    }
+  );
+}
 
   loadAssignedTAs(examId: number): void {
     this.proctoringAssignmentService.getAssignedTAs(examId).subscribe(

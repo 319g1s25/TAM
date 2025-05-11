@@ -16,6 +16,12 @@ export class TAService {
     return this.http.get<TA[]>(`${this.apiUrl}`);
   }
   
+  getTAsByRole(role: string, userId: string): Observable<TA[]> {
+  return this.http.get<TA[]>(`${this.apiUrl}`, {
+    params: { role, userId }
+  });
+}
+
   // Get a TA by ID
   getTA(id: number): Observable<TA> {
     return this.http.get<TA>(`${this.apiUrl}/${id}`);
